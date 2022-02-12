@@ -5,7 +5,7 @@
 #include <tl/expected.hpp>
 
 namespace ipcpp {
-class MessageQueue {
+class mq {
 public:
   enum class OpenMode : int {
     read_only  = O_RDONLY,
@@ -40,36 +40,37 @@ public:
     return rhs | lhs;
   }
 
-  static auto open(char const *name, OpenMode mode) noexcept -> tl::expected<MessageQueue, int>;
+  static auto open(char const *name, OpenMode mode) noexcept -> tl::expected<mq, int>;
   static auto open(char const *name,
                    OpenCreateMode mode,
-                   std::filesystem::perms permission) noexcept -> tl::expected<MessageQueue, int>;
+                   std::filesystem::perms permission) noexcept -> tl::expected<mq, int>;
   static auto open(char const *name,
                    OpenCreateMode mode,
-                   std::filesystem::perms permission, 
+                   std::filesystem::perms permission,
                    long max_messages,
-                   long message_size) noexcept -> tl::expected<MessageQueue, int>;
+                   long message_size) noexcept -> tl::expected<mq, int>;
+  static auto unlink(char const *name) noexcept -> int;
 
-  MessageQueue(MessageQueue const &) = delete;
-  MessageQueue(MessageQueue &&other) noexcept;
+  mq(mq const &) = delete;
+  mq(mq &&other) noexcept;
 
-  auto operator=(MessageQueue const &) -> MessageQueue & = delete;
-  auto operator=(MessageQueue &&other) noexcept -> MessageQueue &;
+  auto operator=(mq const &) -> mq & = delete;
+  auto operator=(mq &&other) noexcept -> mq &;
 
-  ~MessageQueue() noexcept;
+  ~mq() noexcept;
 
 private:
-  MessageQueue(int fd) noexcept;
+  mq(int fd) noexcept;
 
   int m_fd;
 };
 namespace mq_constants {
-static constexpr MessageQueue::OpenMode read_only      = MessageQueue::OpenMode::read_only;
-static constexpr MessageQueue::OpenMode write_only     = MessageQueue::OpenMode::write_only;
-static constexpr MessageQueue::OpenMode read_write     = MessageQueue::OpenMode::read_write;
-static constexpr MessageQueue::CreateMode create       = MessageQueue::CreateMode::create;
-static constexpr MessageQueue::CreateMode exclusive    = MessageQueue::CreateMode::exclusive;
-static constexpr MessageQueue::ExtraFlag close_on_exec = MessageQueue::ExtraFlag::close_on_exec;
-static constexpr MessageQueue::ExtraFlag nonblock      = MessageQueue::ExtraFlag::nonblock;
+static constexpr mq::OpenMode read_only      = mq::OpenMode::read_only;
+static constexpr mq::OpenMode write_only     = mq::OpenMode::write_only;
+static constexpr mq::OpenMode read_write     = mq::OpenMode::read_write;
+static constexpr mq::CreateMode create       = mq::CreateMode::create;
+static constexpr mq::CreateMode exclusive    = mq::CreateMode::exclusive;
+static constexpr mq::ExtraFlag close_on_exec = mq::ExtraFlag::close_on_exec;
+static constexpr mq::ExtraFlag nonblock      = mq::ExtraFlag::nonblock;
 } // namespace mq_constants
 } // namespace ipcpp
