@@ -7,7 +7,7 @@ int main() {
   namespace fs = std::filesystem;
   auto mode    = read_only;
   auto permissions = fs::perms::owner_read;
-  auto message_queue = ipcpp::MessageQueue::open("/test", mode);
+  auto message_queue = ipcpp::mq::open("/test", mode);
 
   fmt::print("{}", message_queue.has_value());
 }
