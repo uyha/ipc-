@@ -17,3 +17,4 @@ out/**
 
 # Clangd
 .cache/**
+compile_commands.json
