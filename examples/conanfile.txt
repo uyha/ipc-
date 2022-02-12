@@ -1,6 +1,5 @@
 [requires]
 fmt/8.1.1
-tl-expected/20190710
 
 [generators]
 cmake_find_package
