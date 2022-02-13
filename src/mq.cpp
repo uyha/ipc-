@@ -35,19 +35,16 @@ auto mq::open(const char *name, OpenCreateMode mode, std::filesystem::perms perm
 auto mq::open(const char *name,
               OpenCreateMode mode,
               std::filesystem::perms permissions,
-              long max_messages,
-              long message_size) noexcept -> tl::expected<mq, OpenError> {
+              CreateAttributes attributes) noexcept -> tl::expected<mq, OpenError> {
   using tl::unexpected, tl::expected;
 
   if (not valid_name(name)) {
     return unexpected{OpenError::NameInvalid};
   }
 
-  auto attribute       = ::mq_attr{};
-  attribute.mq_maxmsg  = max_messages;
-  attribute.mq_msgsize = message_size;
+  auto mq_attributes = attributes.mq_attr();
 
-  auto fd = ::mq_open(name, static_cast<int>(mode), permissions, &attribute);
+  auto fd = ::mq_open(name, static_cast<int>(mode), permissions, &mq_attributes);
   if (fd == -1) {
     return unexpected{map_open_error(errno)};
   }

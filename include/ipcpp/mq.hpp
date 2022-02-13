@@ -3,6 +3,7 @@
 #include <asm-generic/errno.h>
 #include <fcntl.h>
 #include <filesystem>
+#include <mqueue.h>
 #include <tl/expected.hpp>
 
 namespace ipcpp {
@@ -55,6 +56,19 @@ public:
     ErrorUnknown,
   };
 
+  struct CreateAttributes {
+    long max_messages;
+    long message_size;
+
+    constexpr auto mq_attr() const noexcept -> ::mq_attr {
+      auto result       = ::mq_attr{};
+      result.mq_maxmsg  = max_messages;
+      result.mq_msgsize = message_size;
+
+      return result;
+    }
+  };
+
   static auto open(char const *name, OpenMode mode) noexcept -> tl::expected<mq, OpenError>;
   static auto open(char const *name,
                    OpenCreateMode mode,
@@ -62,8 +76,7 @@ public:
   static auto open(char const *name,
                    OpenCreateMode mode,
                    std::filesystem::perms permission,
-                   long max_messages,
-                   long message_size) noexcept -> tl::expected<mq, OpenError>;
+                   CreateAttributes attributes) noexcept -> tl::expected<mq, OpenError>;
   static auto unlink(char const *name) noexcept -> int;
 
   mq(mq const &) = delete;

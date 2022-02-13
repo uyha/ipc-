@@ -20,6 +20,14 @@ TEST_CASE("opening a message queue") {
     REQUIRE(not message_queue);
     REQUIRE(message_queue.error() == mq::OpenError::QueueMissing);
   }
+  SECTION("with invalid attributes") {
+    auto permissions             = fs::perms::owner_read;
+    auto mode                    = read_only | create;
+    auto both_invalid_attributes = mq::CreateAttributes{.max_messages = 0, .message_size = 0};
+    auto message_queue = ipcpp::mq::open(name, mode, permissions, both_invalid_attributes);
+    REQUIRE(not message_queue);
+    REQUIRE(message_queue.error() == mq::OpenError::AttributeInvalid);
+  }
 
   ipcpp::mq::unlink(name);
 }
