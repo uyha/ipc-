@@ -1,19 +1,24 @@
-include(CTest)
 include(use_conan)
 include(build_options)
 
-find_package(Catch2)
+find_package(Catch2 REQUIRED)
 find_package(fmt)
 
+include(CTest)
+include(Catch)
+
+add_library(ipcpp-test-main STATIC EXCLUDE_FROM_ALL main.cpp)
+add_library(ipcpp::test::main ALIAS ipcpp-test-main)
+target_link_libraries(ipcpp-test-main PUBLIC Catch2::Catch2)
+
 macro(construct_test name)
-    add_executable(${name} main.cpp ${ARGN})
-    target_link_libraries(${name} PRIVATE Catch2::Catch2 fmt::fmt)
+    add_executable(${name} ${ARGN})
+    target_link_libraries(${name} PRIVATE ipcpp::test::main fmt::fmt)
     target_compile_features(${name} PRIVATE cxx_std_20)
-    add_test(
-            NAME ${name}
-            COMMAND ${name})
+    target_compile_options(${name} PRIVATE ${warnings})
+    catch_discover_tests(${name})
 endmacro()
 
-construct_test(message-queue message_queue.test.cpp)
-target_link_libraries(message-queue PRIVATE ipcpp::mq)
-target_compile_options(message-queue PRIVATE ${warnings})
+add_subdirectory(mq)
+
+
