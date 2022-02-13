@@ -23,23 +23,30 @@ public:
     close_on_exec = O_CLOEXEC,
     nonblock      = O_NONBLOCK,
   };
+
   friend constexpr auto operator|(OpenMode lhs, ExtraFlag rhs) -> OpenMode {
     return static_cast<OpenMode>(static_cast<int>(lhs) | static_cast<int>(rhs));
   }
   friend constexpr auto operator|(ExtraFlag lhs, OpenMode rhs) -> OpenMode {
     return rhs | lhs;
   }
+
   friend constexpr auto operator|(OpenMode lhs, CreateMode rhs) -> OpenCreateMode {
     return static_cast<OpenCreateMode>(static_cast<int>(lhs) | static_cast<int>(rhs));
   }
   friend constexpr auto operator|(CreateMode lhs, OpenMode rhs) -> OpenCreateMode {
     return rhs | lhs;
   }
+
   friend constexpr auto operator|(OpenCreateMode lhs, ExtraFlag rhs) -> OpenCreateMode {
     return static_cast<OpenCreateMode>(static_cast<int>(lhs) | static_cast<int>(rhs));
   }
   friend constexpr auto operator|(ExtraFlag lhs, OpenCreateMode rhs) -> OpenCreateMode {
     return rhs | lhs;
+  }
+
+  friend constexpr auto operator|(CreateMode lhs, CreateMode rhs) -> CreateMode{
+    return static_cast<CreateMode>(static_cast<int>(lhs) | static_cast<int>(rhs));
   }
 
   enum class OpenError {
