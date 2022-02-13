@@ -13,6 +13,7 @@ TEST_CASE("opening a message queue") {
     auto mode          = read_only | create;
     auto message_queue = ipcpp::mq::open(name, mode, permissions);
     REQUIRE(message_queue);
+    REQUIRE(mq::unlink(name) == 0);
   }
   SECTION("opening non existing queue without creating it") {
     auto mode          = read_only;
@@ -28,8 +29,6 @@ TEST_CASE("opening a message queue") {
     REQUIRE(not message_queue);
     REQUIRE(message_queue.error() == mq::OpenError::AttributeInvalid);
   }
-
-  ipcpp::mq::unlink(name);
 }
 
 TEST_CASE("opening with invalid name") {
