@@ -1,3 +1,5 @@
+cmake_policy(SET CMP0110 NEW)
+
 include(use_conan)
 include(build_options)
 
@@ -20,5 +22,21 @@ macro(construct_test name)
 endmacro()
 
 add_subdirectory(mq)
+
+add_test(NAME [[ipcpp compilation test]]
+  COMMAND "${CMAKE_CTEST_COMMAND}"
+          --build-and-test ${CMAKE_CURRENT_LIST_DIR}/compilation ${CMAKE_CURRENT_BINARY_DIR}/compilation
+          --build-generator ${CMAKE_GENERATOR}
+          --build-options "-DCMAKE_MODULE_PATH=${CMAKE_BINARY_DIR}/src"
+                          "-DIPCPP_MQ=$<TARGET_FILE:ipcpp::mq>"
+                          "-DIPCPP_MQ_INCLUDE=${CMAKE_SOURCE_DIR}/include"
+          --test-command ${CMAKE_CTEST_COMMAND}
+)
+set_tests_properties([[ipcpp compilation test]]
+  PROPERTIES
+    PASS_REGULAR_EXPRESSION [[
+no match for ‘operator|’ (operand types are ‘const ipcpp::mq::OpenMode’ and ‘const ipcpp::mq::OpenMode’)
+]]
+)
 
 
