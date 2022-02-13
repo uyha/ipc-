@@ -1,5 +1,6 @@
 #pragma once
 
+#include <asm-generic/errno.h>
 #include <fcntl.h>
 #include <filesystem>
 #include <tl/expected.hpp>
@@ -40,26 +41,80 @@ public:
     return rhs | lhs;
   }
 
-  static auto open(char const *name, OpenMode mode) noexcept -> tl::expected<mq, int>;
+  enum class OpenError {
+    PermissionDenied,
+    NameInvalid,
+    NameExisting,
+    AttributeInvalid,
+    TooManyProcessFiles,
+    NameTooLong,
+    TooManySystemFiles,
+    QueueMissing,
+    MemoryInsufficient,
+    SpaceInsufficient,
+    ErrorUnknown,
+  };
+
+  static auto open(char const *name, OpenMode mode) noexcept -> tl::expected<mq, OpenError>;
   static auto open(char const *name,
                    OpenCreateMode mode,
-                   std::filesystem::perms permission) noexcept -> tl::expected<mq, int>;
+                   std::filesystem::perms permission) noexcept -> tl::expected<mq, OpenError>;
   static auto open(char const *name,
                    OpenCreateMode mode,
                    std::filesystem::perms permission,
                    long max_messages,
-                   long message_size) noexcept -> tl::expected<mq, int>;
+                   long message_size) noexcept -> tl::expected<mq, OpenError>;
   static auto unlink(char const *name) noexcept -> int;
 
   mq(mq const &) = delete;
   mq(mq &&other) noexcept;
 
   auto operator=(mq const &) -> mq & = delete;
-  auto operator=(mq &&other) noexcept -> mq &;
+  auto operator                      =(mq &&other) noexcept -> mq &;
 
   ~mq() noexcept;
 
 private:
+  static constexpr auto valid_name(char const *name) -> bool {
+    if (name[0] != '/') {
+      return false;
+    }
+    if (name[1] == '\0') {
+      return false;
+    }
+    while (*++name != '\0') {
+      if (*name == '/') {
+        return false;
+      }
+    }
+
+    return true;
+  }
+  static constexpr auto map_open_error(int error) -> OpenError {
+    switch (error) {
+    case EACCES:
+      return OpenError::PermissionDenied;
+    case EEXIST:
+      return OpenError::NameExisting;
+    case EINVAL:
+      return OpenError::AttributeInvalid;
+    case EMFILE:
+      return OpenError::TooManyProcessFiles;
+    case ENAMETOOLONG:
+      return OpenError::NameTooLong;
+    case ENFILE:
+      return OpenError::TooManySystemFiles;
+    case ENOENT:
+      return OpenError::QueueMissing;
+    case ENOMEM:
+      return OpenError::MemoryInsufficient;
+    case ENOSPC:
+      return OpenError::SpaceInsufficient;
+    default:
+      return OpenError::ErrorUnknown;
+    }
+  }
+
   mq(int fd) noexcept;
 
   int m_fd;

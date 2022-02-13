@@ -3,36 +3,45 @@
 #include <mqueue.h>
 
 namespace ipcpp {
-auto mq::open(const char *name, OpenMode mode) noexcept
-    -> tl::expected<mq, int> {
+auto mq::open(const char *name, OpenMode mode) noexcept -> tl::expected<mq, OpenError> {
   using tl::unexpected, tl::expected;
+
+  if (not valid_name(name)) {
+    return unexpected{OpenError::NameInvalid};
+  }
 
   auto fd = ::mq_open(name, static_cast<int>(mode));
   if (fd == -1) {
-    return unexpected{errno};
+    return unexpected{map_open_error(errno)};
   }
 
   return mq{fd};
 }
-auto mq::open(const char *name,
-                        OpenCreateMode mode,
-                        std::filesystem::perms permissions) noexcept
-    -> tl::expected<mq, int> {
+auto mq::open(const char *name, OpenCreateMode mode, std::filesystem::perms permissions) noexcept
+    -> tl::expected<mq, OpenError> {
   using tl::unexpected, tl::expected;
+
+  if (not valid_name(name)) {
+    return unexpected{OpenError::NameInvalid};
+  }
 
   auto fd = ::mq_open(name, static_cast<int>(mode), permissions, nullptr);
   if (fd == -1) {
-    return unexpected{errno};
+    return unexpected{map_open_error(errno)};
   }
 
   return mq{fd};
 }
 auto mq::open(const char *name,
-                        OpenCreateMode mode,
-                        std::filesystem::perms permissions,
-                        long max_messages,
-                        long message_size) noexcept -> tl::expected<mq, int> {
+              OpenCreateMode mode,
+              std::filesystem::perms permissions,
+              long max_messages,
+              long message_size) noexcept -> tl::expected<mq, OpenError> {
   using tl::unexpected, tl::expected;
+
+  if (not valid_name(name)) {
+    return unexpected{OpenError::NameInvalid};
+  }
 
   auto attribute       = ::mq_attr{};
   attribute.mq_maxmsg  = max_messages;
@@ -40,7 +49,7 @@ auto mq::open(const char *name,
 
   auto fd = ::mq_open(name, static_cast<int>(mode), permissions, &attribute);
   if (fd == -1) {
-    return unexpected{errno};
+    return unexpected{map_open_error(errno)};
   }
 
   return mq{fd};
@@ -60,6 +69,7 @@ mq::mq(mq &&other) noexcept
 }
 auto mq::operator=(mq &&other) noexcept -> mq & {
   this->~mq();
+
   m_fd       = other.m_fd;
   other.m_fd = -1;
 
