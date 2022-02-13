@@ -45,7 +45,7 @@ public:
     return rhs | lhs;
   }
 
-  friend constexpr auto operator|(CreateMode lhs, CreateMode rhs) -> CreateMode{
+  friend constexpr auto operator|(CreateMode lhs, CreateMode rhs) -> CreateMode {
     return static_cast<CreateMode>(static_cast<int>(lhs) | static_cast<int>(rhs));
   }
 
@@ -87,10 +87,10 @@ public:
   static auto unlink(char const *name) noexcept -> int;
 
   mq(mq const &) = delete;
-  mq(mq &&other) noexcept;
-
   auto operator=(mq const &) -> mq & = delete;
-  auto operator                      =(mq &&other) noexcept -> mq &;
+
+  mq(mq &&other) noexcept;
+  auto operator=(mq &&other) noexcept -> mq &;
 
   ~mq() noexcept;
 
