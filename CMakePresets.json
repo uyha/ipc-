@@ -14,11 +14,9 @@
       "binaryDir": "${sourceDir}/build",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
-        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-        "CPACK_GENERATOR": "DEB"
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
       },
-      "environment": {
-      }
+      "environment": {}
     }
   ],
   "buildPresets": [
@@ -28,4 +26,3 @@
     }
   ]
 }
-
