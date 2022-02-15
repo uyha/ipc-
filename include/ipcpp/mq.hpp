@@ -54,12 +54,12 @@ public:
 
   struct CreateAttributes {
     long max_messages;
-    long message_size;
+    long max_message_size;
 
     constexpr auto mq_attr() const noexcept -> ::mq_attr {
       auto result       = ::mq_attr{};
       result.mq_maxmsg  = max_messages;
-      result.mq_msgsize = message_size;
+      result.mq_msgsize = max_message_size;
 
       return result;
     }

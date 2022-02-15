@@ -39,7 +39,7 @@ TEST_CASE("opening a message queue") {
   SECTION("with invalid attributes") {
     auto permissions             = fs::perms::owner_read;
     auto mode                    = read_only | create;
-    auto both_invalid_attributes = mq::CreateAttributes{.max_messages = 0, .message_size = 0};
+    auto both_invalid_attributes = mq::CreateAttributes{.max_messages = 0, .max_message_size = 0};
     auto message_queue = ipcpp::mq::open(name, mode, permissions, both_invalid_attributes);
     CHECK(not message_queue);
     CHECK(message_queue.error() == mq::OpenError::attribute_invalid);
