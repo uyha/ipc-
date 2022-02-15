@@ -1,10 +1,13 @@
 #pragma once
 
+#include "macros.hpp"
+
 #include <asm-generic/errno.h>
 #include <fcntl.h>
 #include <filesystem>
 #include <mqueue.h>
 #include <tl/expected.hpp>
+#include <type_traits>
 
 namespace ipcpp {
 class mq {
@@ -24,30 +27,16 @@ public:
     nonblock      = O_NONBLOCK,
   };
 
-  friend constexpr auto operator|(OpenMode lhs, ExtraFlag rhs) -> OpenMode {
-    return static_cast<OpenMode>(static_cast<int>(lhs) | static_cast<int>(rhs));
-  }
-  friend constexpr auto operator|(ExtraFlag lhs, OpenMode rhs) -> OpenMode {
-    return rhs | lhs;
-  }
+  IPCPP_BITOR_OP(OpenMode, ExtraFlag, OpenMode)
+  IPCPP_BITOR_OP(OpenMode, CreateMode, OpenCreateMode)
 
-  friend constexpr auto operator|(OpenMode lhs, CreateMode rhs) -> OpenCreateMode {
-    return static_cast<OpenCreateMode>(static_cast<int>(lhs) | static_cast<int>(rhs));
-  }
-  friend constexpr auto operator|(CreateMode lhs, OpenMode rhs) -> OpenCreateMode {
-    return rhs | lhs;
-  }
+  IPCPP_BITOR_OP(ExtraFlag, ExtraFlag)
 
-  friend constexpr auto operator|(OpenCreateMode lhs, ExtraFlag rhs) -> OpenCreateMode {
-    return static_cast<OpenCreateMode>(static_cast<int>(lhs) | static_cast<int>(rhs));
-  }
-  friend constexpr auto operator|(ExtraFlag lhs, OpenCreateMode rhs) -> OpenCreateMode {
-    return rhs | lhs;
-  }
+  IPCPP_BITOR_OP(CreateMode, CreateMode)
+  IPCPP_BITOR_OP(CreateMode, ExtraFlag, CreateMode)
 
-  friend constexpr auto operator|(CreateMode lhs, CreateMode rhs) -> CreateMode {
-    return static_cast<CreateMode>(static_cast<int>(lhs) | static_cast<int>(rhs));
-  }
+  IPCPP_BITOR_OP(OpenCreateMode, CreateMode, OpenCreateMode)
+  IPCPP_BITOR_OP(OpenCreateMode, ExtraFlag, OpenCreateMode)
 
   enum class OpenError {
     permission_denied,

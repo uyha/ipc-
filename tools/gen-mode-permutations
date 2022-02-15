@@ -1,0 +1,25 @@
+#!/usr/bin/env python3
+
+from itertools import permutations
+
+modes = {
+    "read_only": "O_RDONLY",
+    "create": "O_CREAT",
+    "exclusive": "O_EXCL",
+    "close_on_exec": "O_CLOEXEC",
+    "nonblock": "O_NONBLOCK",
+}
+
+cases = [
+    ["read_only"],
+    ["read_only", "create"],
+    ["read_only", "create", "exclusive"],
+    ["read_only", "create", "exclusive", "close_on_exec"],
+    ["read_only", "create", "exclusive", "close_on_exec", "nonblock"],
+]
+
+for case in cases:
+    for permutation in permutations(case):
+        print(
+            f"""REQUIRE(static_cast<int>({" | ".join(permutation)}) == ({" | ".join(map(modes.__getitem__, case))}));"""
+        )
