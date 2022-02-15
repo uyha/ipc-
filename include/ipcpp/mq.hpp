@@ -92,7 +92,7 @@ public:
   ~mq() noexcept;
 
 private:
-  static constexpr auto valid_name(char const *name) -> bool {
+  static constexpr auto valid_name(char const *name) noexcept -> bool {
     if (name[0] != '/') {
       return false;
     }
@@ -107,7 +107,7 @@ private:
 
     return true;
   }
-  static constexpr auto map_open_error(int error) -> OpenError {
+  static constexpr auto map_open_error(int error) noexcept -> OpenError {
     switch (error) {
     case EACCES:
       return OpenError::permission_denied;
@@ -131,7 +131,7 @@ private:
       return OpenError::error_unknown;
     }
   }
-  static constexpr auto map_unlink_error(int error) -> UnlinkError {
+  static constexpr auto map_unlink_error(int error) noexcept -> UnlinkError {
     switch (error) {
     case EACCES:
       return UnlinkError::permission_denied;
