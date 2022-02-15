@@ -29,23 +29,18 @@ auto mq::open(const char *name,
 
   return mq::open(name, mode, static_cast<int>(permissions), &mq_attributes);
 }
-auto mq::open(const char *name, OpenCreateMode mode, int permissions) noexcept
-    -> tl::expected<mq, OpenError> {
+auto mq::open(const char *name, OpenCreateMode mode, int permissions) noexcept -> tl::expected<mq, OpenError> {
   return mq::open(name, mode, permissions, nullptr);
 }
-auto mq::open(const char *name,
-              OpenCreateMode mode,
-              int permissions,
-              CreateAttributes attributes) noexcept -> tl::expected<mq, OpenError> {
+auto mq::open(const char *name, OpenCreateMode mode, int permissions, CreateAttributes attributes) noexcept
+    -> tl::expected<mq, OpenError> {
   auto mq_attributes = attributes.mq_attr();
 
   return mq::open(name, mode, permissions, &mq_attributes);
 }
 
-auto mq::open(const char *name,
-              OpenCreateMode mode,
-              int permissions,
-              ::mq_attr *attributes) noexcept -> tl::expected<mq, OpenError> {
+auto mq::open(const char *name, OpenCreateMode mode, int permissions, ::mq_attr *attributes) noexcept
+    -> tl::expected<mq, OpenError> {
   using tl::unexpected, tl::expected;
 
   if (not valid_name(name)) {
@@ -72,6 +67,22 @@ auto mq::get_attributes() noexcept -> ::mq_attr {
   auto result = ::mq_attr{};
   ::mq_getattr(m_fd, &result);
   return result;
+}
+
+auto mq::set_block() noexcept -> ::mq_attr {
+  return set_attributes(0);
+}
+auto mq::set_nonblock() noexcept -> ::mq_attr {
+  return set_attributes(O_NONBLOCK);
+}
+auto mq::set_attributes(long flags) noexcept -> ::mq_attr {
+  auto old_attributes     = ::mq_attr{};
+  auto new_attributes     = ::mq_attr{};
+  new_attributes.mq_flags = flags;
+
+  ::mq_setattr(m_fd, &new_attributes, &old_attributes);
+
+  return old_attributes;
 }
 
 mq::mq(mq &&other) noexcept
