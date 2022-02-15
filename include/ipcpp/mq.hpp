@@ -82,6 +82,8 @@ public:
   enum class UnlinkError { permission_denied, name_too_long, queue_missing, error_unknown };
   static auto unlink(char const *name) noexcept -> tl::expected<void, UnlinkError>;
 
+  auto get_attributes() noexcept -> ::mq_attr;
+
   mq(mq const &) = delete;
   auto operator=(mq const &) -> mq & = delete;
 

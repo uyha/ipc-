@@ -68,6 +68,12 @@ auto mq::unlink(const char *name) noexcept -> tl::expected<void, UnlinkError> {
   }
 }
 
+auto mq::get_attributes() noexcept -> ::mq_attr {
+  auto result = ::mq_attr{};
+  ::mq_getattr(m_fd, &result);
+  return result;
+}
+
 mq::mq(mq &&other) noexcept
     : m_fd{other.m_fd} {
   other.m_fd = -1;
