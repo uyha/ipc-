@@ -68,4 +68,12 @@ TEST_CASE("opening with invalid name") {
   auto distanced_middle_slash = mq::open("/na/me", mode);
   CHECK(not distanced_middle_slash);
   CHECK(distanced_middle_slash.error() == mq::OpenError::name_invalid);
+
+  auto too_long_name = mq::open(
+      "/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      mode);
+  CHECK(not too_long_name);
+  CHECK(too_long_name.error() == mq::OpenError::name_too_long);
 }
