@@ -41,7 +41,7 @@ public:
   enum class OpenError {
     permission_denied,
     name_invalid,
-    name_existing,
+    queue_existed,
     attribute_invalid,
     too_many_process_files,
     name_too_long,
@@ -68,11 +68,16 @@ public:
   static auto open(char const *name, OpenMode mode) noexcept -> tl::expected<mq, OpenError>;
   static auto open(char const *name,
                    OpenCreateMode mode,
-                   std::filesystem::perms permission) noexcept -> tl::expected<mq, OpenError>;
+                   std::filesystem::perms permissions) noexcept -> tl::expected<mq, OpenError>;
   static auto open(char const *name,
                    OpenCreateMode mode,
-                   std::filesystem::perms permission,
+                   std::filesystem::perms permissions,
                    CreateAttributes attributes) noexcept -> tl::expected<mq, OpenError>;
+  static auto open(char const *name, OpenCreateMode mode, int permissions) noexcept
+      -> tl::expected<mq, OpenError>;
+  static auto
+  open(char const *name, OpenCreateMode mode, int permissions, CreateAttributes attributes) noexcept
+      -> tl::expected<mq, OpenError>;
 
   enum class UnlinkError { permission_denied, name_too_long, queue_missing, error_unknown };
   static auto unlink(char const *name) noexcept -> tl::expected<void, UnlinkError>;
@@ -106,7 +111,7 @@ private:
     case EACCES:
       return OpenError::permission_denied;
     case EEXIST:
-      return OpenError::name_existing;
+      return OpenError::queue_existed;
     case EINVAL:
       return OpenError::attribute_invalid;
     case EMFILE:
@@ -138,6 +143,9 @@ private:
     }
   }
 
+  static auto
+  open(char const *name, OpenCreateMode mode, int permissions, ::mq_attr *attributes) noexcept
+      -> tl::expected<mq, OpenError>;
   mq(int fd) noexcept;
 
   int m_fd;
