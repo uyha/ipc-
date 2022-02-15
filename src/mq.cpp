@@ -63,7 +63,7 @@ auto mq::unlink(const char *name) noexcept -> tl::expected<void, UnlinkError> {
   }
 }
 
-auto mq::get_attributes() noexcept -> ::mq_attr {
+auto mq::get_attributes() const noexcept -> ::mq_attr {
   auto result = ::mq_attr{};
   ::mq_getattr(m_fd, &result);
   return result;
