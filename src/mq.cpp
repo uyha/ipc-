@@ -52,11 +52,11 @@ auto mq::open(const char *name,
   return mq{fd};
 }
 
-auto mq::unlink(const char *name) noexcept -> int {
+auto mq::unlink(const char *name) noexcept -> tl::expected<void, UnlinkError> {
   if (auto result = ::mq_unlink(name); result == 0) {
-    return 0;
+    return {};
   } else {
-    return errno;
+    return tl::unexpected{map_unlink_error(errno)};
   }
 }
 

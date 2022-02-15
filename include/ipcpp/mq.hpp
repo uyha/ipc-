@@ -84,7 +84,9 @@ public:
                    OpenCreateMode mode,
                    std::filesystem::perms permission,
                    CreateAttributes attributes) noexcept -> tl::expected<mq, OpenError>;
-  static auto unlink(char const *name) noexcept -> int;
+
+  enum class UnlinkError { permission_denied, name_too_long, queue_missing, error_unknown };
+  static auto unlink(char const *name) noexcept -> tl::expected<void, UnlinkError>;
 
   mq(mq const &) = delete;
   auto operator=(mq const &) -> mq & = delete;
@@ -132,6 +134,18 @@ private:
       return OpenError::space_insufficient;
     default:
       return OpenError::error_unknown;
+    }
+  }
+  static constexpr auto map_unlink_error(int error) -> UnlinkError {
+    switch (error) {
+    case EACCES:
+      return UnlinkError::permission_denied;
+    case ENAMETOOLONG:
+      return UnlinkError::name_too_long;
+    case ENOENT:
+      return UnlinkError::queue_missing;
+    default:
+      return UnlinkError::error_unknown;
     }
   }
 
