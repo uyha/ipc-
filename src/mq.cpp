@@ -7,7 +7,7 @@ auto mq::open(const char *name, OpenMode mode) noexcept -> tl::expected<mq, Open
   using tl::unexpected, tl::expected;
 
   if (not valid_name(name)) {
-    return unexpected{OpenError::NameInvalid};
+    return unexpected{OpenError::name_invalid};
   }
 
   auto fd = ::mq_open(name, static_cast<int>(mode));
@@ -22,7 +22,7 @@ auto mq::open(const char *name, OpenCreateMode mode, std::filesystem::perms perm
   using tl::unexpected, tl::expected;
 
   if (not valid_name(name)) {
-    return unexpected{OpenError::NameInvalid};
+    return unexpected{OpenError::name_invalid};
   }
 
   auto fd = ::mq_open(name, static_cast<int>(mode), permissions, nullptr);
@@ -39,7 +39,7 @@ auto mq::open(const char *name,
   using tl::unexpected, tl::expected;
 
   if (not valid_name(name)) {
-    return unexpected{OpenError::NameInvalid};
+    return unexpected{OpenError::name_invalid};
   }
 
   auto mq_attributes = attributes.mq_attr();

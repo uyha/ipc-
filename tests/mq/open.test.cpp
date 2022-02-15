@@ -19,7 +19,7 @@ TEST_CASE("opening a message queue") {
     auto mode          = read_only;
     auto message_queue = ipcpp::mq::open(name, mode);
     REQUIRE(not message_queue);
-    REQUIRE(message_queue.error() == mq::OpenError::QueueMissing);
+    REQUIRE(message_queue.error() == mq::OpenError::queue_missing);
   }
   SECTION("with invalid attributes") {
     auto permissions             = fs::perms::owner_read;
@@ -27,7 +27,7 @@ TEST_CASE("opening a message queue") {
     auto both_invalid_attributes = mq::CreateAttributes{.max_messages = 0, .message_size = 0};
     auto message_queue = ipcpp::mq::open(name, mode, permissions, both_invalid_attributes);
     REQUIRE(not message_queue);
-    REQUIRE(message_queue.error() == mq::OpenError::AttributeInvalid);
+    REQUIRE(message_queue.error() == mq::OpenError::attribute_invalid);
   }
 }
 
@@ -36,21 +36,21 @@ TEST_CASE("opening with invalid name") {
 
   auto empty_name = mq::open("", mode);
   REQUIRE(not empty_name);
-  REQUIRE(empty_name.error() == mq::OpenError::NameInvalid);
+  REQUIRE(empty_name.error() == mq::OpenError::name_invalid);
 
   auto only_slash = mq::open("/", mode);
   REQUIRE(not only_slash);
-  REQUIRE(only_slash.error() == mq::OpenError::NameInvalid);
+  REQUIRE(only_slash.error() == mq::OpenError::name_invalid);
 
   auto adjacent_slashes = mq::open("//", mode);
   REQUIRE(not adjacent_slashes);
-  REQUIRE(adjacent_slashes.error() == mq::OpenError::NameInvalid);
+  REQUIRE(adjacent_slashes.error() == mq::OpenError::name_invalid);
 
   auto distanced_end_slash = mq::open("/name/", mode);
   REQUIRE(not distanced_end_slash);
-  REQUIRE(distanced_end_slash.error() == mq::OpenError::NameInvalid);
+  REQUIRE(distanced_end_slash.error() == mq::OpenError::name_invalid);
 
   auto distanced_middle_slash = mq::open("/na/me", mode);
   REQUIRE(not distanced_middle_slash);
-  REQUIRE(distanced_middle_slash.error() == mq::OpenError::NameInvalid);
+  REQUIRE(distanced_middle_slash.error() == mq::OpenError::name_invalid);
 }

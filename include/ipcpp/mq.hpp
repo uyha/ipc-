@@ -50,17 +50,17 @@ public:
   }
 
   enum class OpenError {
-    PermissionDenied,
-    NameInvalid,
-    NameExisting,
-    AttributeInvalid,
-    TooManyProcessFiles,
-    NameTooLong,
-    TooManySystemFiles,
-    QueueMissing,
-    MemoryInsufficient,
-    SpaceInsufficient,
-    ErrorUnknown,
+    permission_denied,
+    name_invalid,
+    name_existing,
+    attribute_invalid,
+    too_many_process_files,
+    name_too_long,
+    too_many_system_files,
+    queue_missing,
+    memory_insufficient,
+    space_insufficient,
+    error_unknown,
   };
 
   struct CreateAttributes {
@@ -113,25 +113,25 @@ private:
   static constexpr auto map_open_error(int error) -> OpenError {
     switch (error) {
     case EACCES:
-      return OpenError::PermissionDenied;
+      return OpenError::permission_denied;
     case EEXIST:
-      return OpenError::NameExisting;
+      return OpenError::name_existing;
     case EINVAL:
-      return OpenError::AttributeInvalid;
+      return OpenError::attribute_invalid;
     case EMFILE:
-      return OpenError::TooManyProcessFiles;
+      return OpenError::too_many_process_files;
     case ENAMETOOLONG:
-      return OpenError::NameTooLong;
+      return OpenError::name_too_long;
     case ENFILE:
-      return OpenError::TooManySystemFiles;
+      return OpenError::too_many_system_files;
     case ENOENT:
-      return OpenError::QueueMissing;
+      return OpenError::queue_missing;
     case ENOMEM:
-      return OpenError::MemoryInsufficient;
+      return OpenError::memory_insufficient;
     case ENOSPC:
-      return OpenError::SpaceInsufficient;
+      return OpenError::space_insufficient;
     default:
-      return OpenError::ErrorUnknown;
+      return OpenError::error_unknown;
     }
   }
 
