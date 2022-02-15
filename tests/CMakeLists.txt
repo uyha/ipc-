@@ -23,7 +23,7 @@ endmacro()
 
 add_subdirectory(mq)
 
-add_test(NAME [[ipcpp mode combination]]
+add_test(NAME [[mq invalid mode combination]]
   COMMAND "${CMAKE_CTEST_COMMAND}"
           --build-and-test ${CMAKE_CURRENT_LIST_DIR}/compilation ${CMAKE_CURRENT_BINARY_DIR}/compilation
           --build-generator ${CMAKE_GENERATOR}
@@ -32,7 +32,7 @@ add_test(NAME [[ipcpp mode combination]]
                           "-DIPCPP_MQ=$<TARGET_FILE:ipcpp::mq>"
                           "-DIPCPP_MQ_INCLUDE=${CMAKE_SOURCE_DIR}/include"
 )
-set_tests_properties([[ipcpp mode combination]]
+set_tests_properties([[mq invalid mode combination]]
   PROPERTIES
     PASS_REGULAR_EXPRESSION [[
 no match for ‘operator|’ (operand types are ‘const ipcpp::mq::OpenMode’ and ‘const ipcpp::mq::OpenMode’)
