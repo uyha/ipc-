@@ -26,14 +26,14 @@ TEST_CASE("opening a message queue") {
     auto message_queue = ipcpp::mq::open(name, mode, 0666);
     CHECK(message_queue);
     auto dup_message_queue = ipcpp::mq::open(name, read_only | create | exclusive, 0666);
-    CHECK(not dup_message_queue);
+    CHECK_FALSE( dup_message_queue);
     CHECK(dup_message_queue.error() == mq::OpenError::queue_existed);
     CHECK(mq::unlink(name).has_value());
   }
   SECTION("opening non existing queue without creating it") {
     auto mode          = read_only;
     auto message_queue = ipcpp::mq::open(name, mode);
-    CHECK(not message_queue);
+    CHECK_FALSE( message_queue);
     CHECK(message_queue.error() == mq::OpenError::queue_missing);
   }
   SECTION("with invalid attributes") {
@@ -41,7 +41,7 @@ TEST_CASE("opening a message queue") {
     auto mode                    = read_only | create;
     auto both_invalid_attributes = mq::CreateAttributes{.max_messages = 0, .max_message_size = 0};
     auto message_queue = ipcpp::mq::open(name, mode, permissions, both_invalid_attributes);
-    CHECK(not message_queue);
+    CHECK_FALSE( message_queue);
     CHECK(message_queue.error() == mq::OpenError::attribute_invalid);
   }
 }
@@ -50,23 +50,23 @@ TEST_CASE("opening with invalid name") {
   auto mode = read_only;
 
   auto empty_name = mq::open("", mode);
-  CHECK(not empty_name);
+  CHECK_FALSE( empty_name);
   CHECK(empty_name.error() == mq::OpenError::name_invalid);
 
   auto only_slash = mq::open("/", mode);
-  CHECK(not only_slash);
+  CHECK_FALSE( only_slash);
   CHECK(only_slash.error() == mq::OpenError::name_invalid);
 
   auto adjacent_slashes = mq::open("//", mode);
-  CHECK(not adjacent_slashes);
+  CHECK_FALSE( adjacent_slashes);
   CHECK(adjacent_slashes.error() == mq::OpenError::name_invalid);
 
   auto distanced_end_slash = mq::open("/name/", mode);
-  CHECK(not distanced_end_slash);
+  CHECK_FALSE( distanced_end_slash);
   CHECK(distanced_end_slash.error() == mq::OpenError::name_invalid);
 
   auto distanced_middle_slash = mq::open("/na/me", mode);
-  CHECK(not distanced_middle_slash);
+  CHECK_FALSE( distanced_middle_slash);
   CHECK(distanced_middle_slash.error() == mq::OpenError::name_invalid);
 
   auto too_long_name = mq::open(
@@ -74,6 +74,6 @@ TEST_CASE("opening with invalid name") {
       "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
       "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
       mode);
-  CHECK(not too_long_name);
+  CHECK_FALSE( too_long_name);
   CHECK(too_long_name.error() == mq::OpenError::name_too_long);
 }

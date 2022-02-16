@@ -10,7 +10,7 @@ TEST_CASE("getting attribute of a queue") {
     auto queue = mq::open(name, read_only | create, 0666);
     CHECK(queue);
     auto attributes = queue->get_attributes();
-    CHECK(not(attributes.mq_flags & O_NONBLOCK));
+    CHECK_FALSE(attributes.mq_flags & O_NONBLOCK);
   }
   SECTION("getting attribute of a nonblocking queue") {
     auto queue = mq::open(name, read_only | create | nonblock, 0666);
@@ -28,7 +28,7 @@ TEST_CASE("setting/getting attribute of a queue") {
     CHECK(queue);
 
     auto attributes = queue->get_attributes();
-    CHECK(not(attributes.mq_flags & O_NONBLOCK));
+    CHECK_FALSE(attributes.mq_flags & O_NONBLOCK);
 
     auto old_attributes = queue->set_nonblock();
     CHECK(attributes.mq_flags == old_attributes.mq_flags);
@@ -53,7 +53,7 @@ TEST_CASE("setting/getting attribute of a queue") {
     CHECK(attributes.mq_curmsgs == old_attributes.mq_curmsgs);
 
     auto new_attributes = queue->get_attributes();
-    CHECK(not(new_attributes.mq_flags & O_NONBLOCK));
+    CHECK_FALSE(new_attributes.mq_flags & O_NONBLOCK);
   }
   CHECK(mq::unlink(name));
 }
