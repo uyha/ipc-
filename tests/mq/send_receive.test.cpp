@@ -51,3 +51,42 @@ TEST_CASE("reading empty nonblocking queue") {
 
   mq::unlink(name);
 }
+TEST_CASE("sending and reading from the same queue") {
+  auto name     = "/send-receive";
+  auto buffer   = std::array<char, 1>{'\0'};
+  auto queue    = mq::open(name, create | read_write, 0666, {.max_messages = 2, .max_message_size = 1});
+  auto priority = 1000u;
+  REQUIRE(queue);
+  SECTION("send then receive") {
+    auto send_result = queue->send(name, 1);
+    CHECK(send_result);
+    auto receive_result = queue->receive(std::data(buffer), std::size(buffer), &priority);
+    CHECK(receive_result);
+    CHECK(priority == 0);
+    CHECK(std::get<0>(buffer) == '/');
+  }
+  SECTION("send then receive with difference priority") {
+    {
+      auto send_result = queue->send(name, 1);
+      CHECK(send_result);
+    }
+    {
+      auto send_result = queue->send(name + 1, 1, 1);
+      CHECK(send_result);
+    }
+    {
+      auto receive_result = queue->receive(std::data(buffer), std::size(buffer), &priority);
+      CHECK(receive_result);
+      CHECK(priority == 1);
+      CHECK(std::get<0>(buffer) == 's');
+    }
+    {
+      auto receive_result = queue->receive(std::data(buffer), std::size(buffer), &priority);
+      CHECK(receive_result);
+      CHECK(priority == 0);
+      CHECK(std::get<0>(buffer) == '/');
+    }
+  }
+
+  mq::unlink(name);
+}
