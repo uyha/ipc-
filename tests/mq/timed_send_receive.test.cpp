@@ -5,6 +5,7 @@
 
 using namespace ipcpp;
 using namespace mq_constants;
+using namespace std::chrono;
 using namespace std::chrono_literals;
 
 TEST_CASE("timed sending nonblocking message queue") {
@@ -33,12 +34,17 @@ TEST_CASE("timed sending blocking message queue") {
     CHECK(result);
   }
   {
-    auto send_time    = std::chrono::steady_clock::now();
+    auto send_time    = steady_clock::now();
     auto result       = queue->send(name, 1, 0.1005s);
-    auto timeout_time = std::chrono::steady_clock::now();
+    auto timeout_time = steady_clock::now();
     CHECK_FALSE(result);
     CHECK(result.error() == mq::TimedSendError::timedout);
     CHECK(timeout_time - send_time >= 0.1005s);
+  }
+  {
+    auto result = queue->send(name, 1, -(system_clock::now().time_since_epoch() + 1s));
+    CHECK_FALSE(result);
+    CHECK(result.error() == mq::TimedSendError::timeout_invalid);
   }
 
   mq::unlink(name);
