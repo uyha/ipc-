@@ -83,7 +83,7 @@ public:
   auto set_nonblock() noexcept -> ::mq_attr;
 
   enum class SendError : int { queue_full, interrupted, message_too_big, error_unknown };
-  auto send(char const *buffer, std::size_t len, unsigned int priority) noexcept -> tl::expected<void, SendError>;
+  auto send(char const *buffer, std::size_t len, unsigned int priority = 0) noexcept -> tl::expected<void, SendError>;
 
   mq(mq const &) = delete;
   auto operator=(mq const &) -> mq & = delete;
