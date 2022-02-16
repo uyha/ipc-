@@ -85,6 +85,10 @@ public:
   enum class SendError : int { queue_full, interrupted, message_too_big, error_unknown };
   auto send(char const *buffer, std::size_t len, unsigned int priority = 0) noexcept -> tl::expected<void, SendError>;
 
+  enum class ReceiveError : int { queue_empty, interrupted, buffer_too_small, error_unknown };
+  auto receive(char *buffer, std::size_t len, unsigned int *priority = nullptr) noexcept
+      -> tl::expected<std::size_t, ReceiveError>;
+
   mq(mq const &) = delete;
   auto operator=(mq const &) -> mq & = delete;
 
@@ -155,6 +159,18 @@ private:
       return SendError::message_too_big;
     default:
       return SendError::error_unknown;
+    }
+  }
+  static constexpr auto map_receive_error(int error) noexcept -> ReceiveError {
+    switch (error) {
+    case EAGAIN:
+      return ReceiveError::queue_empty;
+    case EINTR:
+      return ReceiveError::interrupted;
+    case EMSGSIZE:
+      return ReceiveError::buffer_too_small;
+    default:
+      return ReceiveError::error_unknown;
     }
   }
 

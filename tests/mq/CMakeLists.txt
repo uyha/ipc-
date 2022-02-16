@@ -4,6 +4,6 @@ target_sources(ipcpp-mq-test PRIVATE
   mode.test.cpp
   unlink.test.cpp
   attribute.test.cpp
-  send.test.cpp
+  send_receive.test.cpp
 )
 target_link_libraries(ipcpp-mq-test PRIVATE ipcpp::mq)

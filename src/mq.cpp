@@ -92,6 +92,14 @@ auto mq::send(const char *buffer, std::size_t len, unsigned int priority) noexce
     return tl::unexpected{map_send_error(errno)};
   }
 }
+auto mq::receive(char *buffer, std::size_t len, unsigned int *priority) noexcept
+    -> tl::expected<std::size_t, ReceiveError> {
+  if (auto const result = ::mq_receive(m_fd, buffer, len, priority); result != -1) {
+    return result;
+  } else {
+    return tl::unexpected{map_receive_error(errno)};
+  }
+}
 
 mq::mq(mq &&other) noexcept
     : m_fd{other.m_fd} {
