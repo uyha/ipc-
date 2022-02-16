@@ -1,5 +1,6 @@
 #pragma once
 
+#include "chrono.hpp"
 #include "macros.hpp"
 
 #include <asm-generic/errno.h>
@@ -89,6 +90,23 @@ public:
   auto receive(char *buffer, std::size_t len, unsigned int *priority = nullptr) noexcept
       -> tl::expected<std::size_t, ReceiveError>;
 
+  enum class TimedSendError : int {
+    queue_full,
+    interrupted,
+    timeout_invalid,
+    message_too_big,
+    timedout,
+    error_unknown
+  };
+  template <typename DurationRep, typename DurationPeriod>
+  auto send(char const *buffer,
+            std::size_t len,
+            std::chrono::duration<DurationRep, DurationPeriod> wait_duration,
+            unsigned int priority = 0) noexcept -> tl::expected<void, TimedSendError> {
+    auto timespec = to_timespec(std::chrono::system_clock::now() + wait_duration);
+    return timed_send(buffer, len, &timespec, priority);
+  }
+
   mq(mq const &) = delete;
   auto operator=(mq const &) -> mq & = delete;
 
@@ -174,10 +192,30 @@ private:
     }
   }
 
+  static constexpr auto map_timed_send_error(int error) noexcept -> TimedSendError {
+    switch (error) {
+    case EAGAIN:
+      return TimedSendError::queue_full;
+    case EINTR:
+      return TimedSendError::interrupted;
+    case EINVAL:
+      return TimedSendError::timeout_invalid;
+    case EMSGSIZE:
+      return TimedSendError::message_too_big;
+    case ETIMEDOUT:
+      return TimedSendError::timedout;
+    default:
+      return TimedSendError::error_unknown;
+    }
+  }
+
   static auto open(char const *name, OpenCreateMode mode, int permissions, ::mq_attr *attributes) noexcept
       -> tl::expected<mq, OpenError>;
 
   auto set_attributes(long flags) noexcept -> ::mq_attr;
+
+  auto timed_send(char const *buffer, std::size_t len, ::timespec const *timeout, unsigned int priority) noexcept
+      -> tl::expected<void, TimedSendError>;
 
   mq(int fd) noexcept;
 
