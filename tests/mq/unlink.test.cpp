@@ -5,12 +5,12 @@ using namespace ipcpp;
 using namespace mq_constants;
 
 TEST_CASE("unlinking non existing queue") {
-  auto result = mq::unlink("/random");
+  auto result = mq::unlink("/unlink");
   CHECK(not result);
   CHECK(result.error() == mq::UnlinkError::queue_missing);
 }
 TEST_CASE("creating and unlinking queue") {
-  auto name   = "/random";
+  auto name   = "/unlink";
   auto queue  = mq::open(name, read_only | create, 0666);
   auto result = mq::unlink(name);
   CHECK(result);
