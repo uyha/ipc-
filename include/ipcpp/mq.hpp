@@ -82,6 +82,8 @@ public:
   auto set_block() noexcept -> ::mq_attr;
   auto set_nonblock() noexcept -> ::mq_attr;
 
+  enum class SendError : int { queue_full, interrupted, message_too_big, error_unknown };
+  auto send(char const *buffer, std::size_t len, unsigned int priority) noexcept -> tl::expected<void, SendError>;
 
   mq(mq const &) = delete;
   auto operator=(mq const &) -> mq & = delete;
@@ -141,6 +143,18 @@ private:
       return UnlinkError::queue_missing;
     default:
       return UnlinkError::error_unknown;
+    }
+  }
+  static constexpr auto map_send_error(int error) noexcept -> SendError {
+    switch (error) {
+    case EAGAIN:
+      return SendError::queue_full;
+    case EINTR:
+      return SendError::interrupted;
+    case EMSGSIZE:
+      return SendError::message_too_big;
+    default:
+      return SendError::error_unknown;
     }
   }
 

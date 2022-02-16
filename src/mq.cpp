@@ -85,6 +85,14 @@ auto mq::set_attributes(long flags) noexcept -> ::mq_attr {
   return old_attributes;
 }
 
+auto mq::send(const char *buffer, std::size_t len, unsigned int priority) noexcept -> tl::expected<void, SendError> {
+  if (auto const result = ::mq_send(m_fd, buffer, len, priority); result == 0) {
+    return {};
+  } else {
+    return tl::unexpected{map_send_error(errno)};
+  }
+}
+
 mq::mq(mq &&other) noexcept
     : m_fd{other.m_fd} {
   other.m_fd = -1;
