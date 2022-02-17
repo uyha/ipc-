@@ -8,6 +8,10 @@ find_package(Catch2 REQUIRED)
 include(CTest)
 include(Catch)
 
+if(NOT BUILD_TESTING)
+  return()
+endif()
+
 add_library(ipcpp-test-main STATIC EXCLUDE_FROM_ALL main.cpp)
 add_library(ipcpp::test::main ALIAS ipcpp-test-main)
 target_link_libraries(ipcpp-test-main PUBLIC Catch2::Catch2)
