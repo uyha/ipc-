@@ -26,6 +26,10 @@ endmacro()
 
 add_subdirectory(mq)
 
+construct_test(ipcpp-chrono-test)
+target_sources(ipcpp-chrono-test PRIVATE chrono.test.cpp)
+target_link_libraries(ipcpp-chrono-test PRIVATE ipcpp::mq)
+
 add_test(NAME [[mq invalid mode combination]]
   COMMAND "${CMAKE_CTEST_COMMAND}"
           --build-and-test ${CMAKE_CURRENT_LIST_DIR}/compilation ${CMAKE_CURRENT_BINARY_DIR}/compilation
