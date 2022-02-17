@@ -1,3 +1,5 @@
+find_package(Threads REQUIRED)
+
 construct_test(ipcpp-mq-test)
 target_sources(ipcpp-mq-test PRIVATE
   open.test.cpp
@@ -7,4 +9,4 @@ target_sources(ipcpp-mq-test PRIVATE
   send_receive.test.cpp
   timed_send_receive.test.cpp
 )
-target_link_libraries(ipcpp-mq-test PRIVATE ipcpp::mq)
+target_link_libraries(ipcpp-mq-test PRIVATE ipcpp::mq Threads::Threads)
