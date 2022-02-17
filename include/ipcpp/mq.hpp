@@ -107,6 +107,23 @@ public:
     return timed_send(buffer, len, &timespec, priority);
   }
 
+  enum class TimedReceiveError : int {
+    queue_empty,
+    interrupted,
+    timeout_invalid,
+    buffer_too_small,
+    timedout,
+    error_unknown
+  };
+  template <typename DurationRep, typename DurationPeriod>
+  auto receive(char *buffer,
+               std::size_t len,
+               std::chrono::duration<DurationRep, DurationPeriod> wait_duration,
+               unsigned int *priority = nullptr) noexcept -> tl::expected<std::size_t, TimedReceiveError> {
+    auto timespec = to_timespec(std::chrono::system_clock::now() + wait_duration);
+    return timed_receive(buffer, len, &timespec, priority);
+  }
+
   mq(mq const &) = delete;
   auto operator=(mq const &) -> mq & = delete;
 
@@ -208,6 +225,22 @@ private:
       return TimedSendError::error_unknown;
     }
   }
+  static constexpr auto map_timed_receive_error(int error) noexcept -> TimedReceiveError {
+    switch (error) {
+    case EAGAIN:
+      return TimedReceiveError::queue_empty;
+    case EINTR:
+      return TimedReceiveError::interrupted;
+    case EINVAL:
+      return TimedReceiveError::timeout_invalid;
+    case EMSGSIZE:
+      return TimedReceiveError::buffer_too_small;
+    case ETIMEDOUT:
+      return TimedReceiveError::timedout;
+    default:
+      return TimedReceiveError::error_unknown;
+    }
+  }
 
   static auto open(char const *name, OpenCreateMode mode, int permissions, ::mq_attr *attributes) noexcept
       -> tl::expected<mq, OpenError>;
@@ -216,6 +249,9 @@ private:
 
   auto timed_send(char const *buffer, std::size_t len, ::timespec const *timeout, unsigned int priority) noexcept
       -> tl::expected<void, TimedSendError>;
+  auto
+  timed_receive(char *buffer, std::size_t len, ::timespec const *timeout, unsigned int *priority = nullptr) noexcept
+      -> tl::expected<std::size_t, TimedReceiveError>;
 
   mq(int fd) noexcept;
 

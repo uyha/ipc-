@@ -9,7 +9,7 @@ using namespace std::chrono;
 using namespace std::chrono_literals;
 
 TEST_CASE("timed sending nonblocking message queue") {
-  auto name  = "/time-send-nonblock";
+  auto name  = "/mq.timed-send-nonblock";
   auto queue = mq::open(name, write_only | create | nonblock, 0666, {.max_messages = 1, .max_message_size = 1});
   REQUIRE(queue);
   {
@@ -26,7 +26,7 @@ TEST_CASE("timed sending nonblocking message queue") {
 }
 
 TEST_CASE("timed sending blocking message queue") {
-  auto name  = "/time-send";
+  auto name  = "/mq.timed-send-block";
   auto queue = mq::open(name, write_only | create, 0666, {.max_messages = 1, .max_message_size = 1});
   REQUIRE(queue);
   {
@@ -49,3 +49,41 @@ TEST_CASE("timed sending blocking message queue") {
 
   mq::unlink(name);
 }
+
+TEST_CASE("timed receiving nonblocking message queue") {
+  auto name   = "/mq.timed-receive-nonblock";
+  auto queue  = mq::open(name, read_only | create | nonblock, 0666, {.max_messages = 1, .max_message_size = 1});
+  auto result = queue->receive(nullptr, 1, 2s);
+  CHECK_FALSE(result);
+  CHECK(result.error() == mq::TimedReceiveError::queue_empty);
+  mq::unlink(name);
+}
+
+TEST_CASE("timed receiving blocking message queue") {
+  auto name  = "/mq.timed-receive-block";
+  auto queue = mq::open(name, read_only | create, 0666, {.max_messages = 1, .max_message_size = 1});
+  REQUIRE(queue);
+  {
+    auto result = queue->receive(nullptr, 1, 0.5s);
+    CHECK_FALSE(result);
+    CHECK(result.error() == mq::TimedReceiveError::timedout);
+  }
+  {
+    auto start  = steady_clock::now();
+    auto result = queue->receive(nullptr, 1, 0.1005s);
+    auto end    = steady_clock::now();
+    CHECK_FALSE(result);
+    CHECK(result.error() == mq::TimedReceiveError::timedout);
+    CHECK(end - start >= 0.1005s);
+  }
+  {
+    auto result = queue->receive(nullptr, 1, -(system_clock::now().time_since_epoch() + 1s));
+    CHECK_FALSE(result);
+    CHECK(result.error() == mq::TimedReceiveError::timeout_invalid);
+  }
+  mq::unlink(name);
+}
+
+/* TEST_CASE("timed sending and receiving") { */
+/*   auto name = "/mq.timed-sending-receiving-block"; */
+/* } */
