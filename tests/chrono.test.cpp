@@ -18,6 +18,8 @@ TEST_CASE("to_timespec") {
   CHECK(ipcpp::to_timespec(system_clock::time_point{}) == ::timespec{});
   CHECK(ipcpp::to_timespec(system_clock::time_point{} + 2s) == ::timespec{.tv_sec = 2, .tv_nsec = 0});
   CHECK(ipcpp::to_timespec(system_clock::time_point{} + 2s + 2ns) == ::timespec{.tv_sec = 2, .tv_nsec = 2});
-  CHECK(ipcpp::to_timespec(system_clock::time_point{} + 2s + 999'999'999ns) == ::timespec{.tv_sec = 2, .tv_nsec = 999'999'999});
-  CHECK(ipcpp::to_timespec(system_clock::time_point{} + 2s + 1'999'999'999ns) == ::timespec{.tv_sec = 3, .tv_nsec = 999'999'999});
+  CHECK(ipcpp::to_timespec(system_clock::time_point{} + 2s + 999'999'999ns)
+        == ::timespec{.tv_sec = 2, .tv_nsec = 999'999'999});
+  CHECK(ipcpp::to_timespec(system_clock::time_point{} + 2s + 1'999'999'999ns)
+        == ::timespec{.tv_sec = 3, .tv_nsec = 999'999'999});
 }
