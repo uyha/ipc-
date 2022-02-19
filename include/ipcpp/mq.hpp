@@ -66,28 +66,31 @@ public:
     }
   };
 
-  static auto open(char const *name, OpenMode mode) noexcept -> tl::expected<mq, OpenError>;
-  static auto open(char const *name, OpenCreateMode mode, std::filesystem::perms permissions) noexcept
+  [[nodiscard]] static auto open(char const *name, OpenMode mode) noexcept -> tl::expected<mq, OpenError>;
+  [[nodiscard]] static auto open(char const *name, OpenCreateMode mode, std::filesystem::perms permissions) noexcept
       -> tl::expected<mq, OpenError>;
-  static auto
+  [[nodiscard]] static auto
   open(char const *name, OpenCreateMode mode, std::filesystem::perms permissions, CreateAttributes attributes) noexcept
       -> tl::expected<mq, OpenError>;
-  static auto open(char const *name, OpenCreateMode mode, int permissions) noexcept -> tl::expected<mq, OpenError>;
-  static auto open(char const *name, OpenCreateMode mode, int permissions, CreateAttributes attributes) noexcept
+  [[nodiscard]] static auto open(char const *name, OpenCreateMode mode, int permissions) noexcept
+      -> tl::expected<mq, OpenError>;
+  [[nodiscard]] static auto
+  open(char const *name, OpenCreateMode mode, int permissions, CreateAttributes attributes) noexcept
       -> tl::expected<mq, OpenError>;
 
   enum class UnlinkError { permission_denied, name_too_long, queue_missing, error_unknown };
-  static auto unlink(char const *name) noexcept -> tl::expected<void, UnlinkError>;
+  [[nodiscard]] static auto unlink(char const *name) noexcept -> tl::expected<void, UnlinkError>;
 
-  auto get_attributes() const noexcept -> ::mq_attr;
-  auto set_block() noexcept -> ::mq_attr;
-  auto set_nonblock() noexcept -> ::mq_attr;
+  [[nodiscard]] auto get_attributes() const noexcept -> ::mq_attr;
+  [[nodiscard]] auto set_block() noexcept -> ::mq_attr;
+  [[nodiscard]] auto set_nonblock() noexcept -> ::mq_attr;
 
   enum class SendError : int { queue_full, interrupted, message_too_big, error_unknown };
-  auto send(char const *buffer, std::size_t len, unsigned int priority = 0) noexcept -> tl::expected<void, SendError>;
+  [[nodiscard]] auto send(char const *buffer, std::size_t len, unsigned int priority = 0) noexcept
+      -> tl::expected<void, SendError>;
 
   enum class ReceiveError : int { queue_empty, interrupted, buffer_too_small, error_unknown };
-  auto receive(char *buffer, std::size_t len, unsigned int *priority = nullptr) noexcept
+  [[nodiscard]] auto receive(char *buffer, std::size_t len, unsigned int *priority = nullptr) noexcept
       -> tl::expected<std::size_t, ReceiveError>;
 
   enum class TimedSendError : int {
@@ -99,10 +102,10 @@ public:
     error_unknown
   };
   template <typename DurationRep, typename DurationPeriod>
-  auto send(char const *buffer,
-            std::size_t len,
-            std::chrono::duration<DurationRep, DurationPeriod> wait_duration,
-            unsigned int priority = 0) noexcept -> tl::expected<void, TimedSendError> {
+  [[nodiscard]] auto send(char const *buffer,
+                          std::size_t len,
+                          std::chrono::duration<DurationRep, DurationPeriod> wait_duration,
+                          unsigned int priority = 0) noexcept -> tl::expected<void, TimedSendError> {
     auto timespec = to_timespec(std::chrono::system_clock::now() + wait_duration);
     return timed_send(buffer, len, &timespec, priority);
   }
@@ -116,10 +119,11 @@ public:
     error_unknown
   };
   template <typename DurationRep, typename DurationPeriod>
-  auto receive(char *buffer,
-               std::size_t len,
-               std::chrono::duration<DurationRep, DurationPeriod> wait_duration,
-               unsigned int *priority = nullptr) noexcept -> tl::expected<std::size_t, TimedReceiveError> {
+  [[nodiscard]] auto receive(char *buffer,
+                             std::size_t len,
+                             std::chrono::duration<DurationRep, DurationPeriod> wait_duration,
+                             unsigned int *priority = nullptr) noexcept
+      -> tl::expected<std::size_t, TimedReceiveError> {
     auto timespec = to_timespec(std::chrono::system_clock::now() + wait_duration);
     return timed_receive(buffer, len, &timespec, priority);
   }
@@ -133,7 +137,7 @@ public:
   ~mq() noexcept;
 
 private:
-  static constexpr auto valid_name(char const *name) noexcept -> bool {
+  [[nodiscard]] static constexpr auto valid_name(char const *name) noexcept -> bool {
     if (name[0] != '/') {
       return false;
     }
@@ -148,7 +152,7 @@ private:
 
     return true;
   }
-  static constexpr auto map_open_error(int error) noexcept -> OpenError {
+  [[nodiscard]] static constexpr auto map_open_error(int error) noexcept -> OpenError {
     switch (error) {
     case EACCES:
       return OpenError::permission_denied;
@@ -172,7 +176,7 @@ private:
       return OpenError::error_unknown;
     }
   }
-  static constexpr auto map_unlink_error(int error) noexcept -> UnlinkError {
+  [[nodiscard]] static constexpr auto map_unlink_error(int error) noexcept -> UnlinkError {
     switch (error) {
     case EACCES:
       return UnlinkError::permission_denied;
@@ -184,7 +188,7 @@ private:
       return UnlinkError::error_unknown;
     }
   }
-  static constexpr auto map_send_error(int error) noexcept -> SendError {
+  [[nodiscard]] static constexpr auto map_send_error(int error) noexcept -> SendError {
     switch (error) {
     case EAGAIN:
       return SendError::queue_full;
@@ -196,7 +200,7 @@ private:
       return SendError::error_unknown;
     }
   }
-  static constexpr auto map_receive_error(int error) noexcept -> ReceiveError {
+  [[nodiscard]] static constexpr auto map_receive_error(int error) noexcept -> ReceiveError {
     switch (error) {
     case EAGAIN:
       return ReceiveError::queue_empty;
@@ -209,7 +213,7 @@ private:
     }
   }
 
-  static constexpr auto map_timed_send_error(int error) noexcept -> TimedSendError {
+  [[nodiscard]] static constexpr auto map_timed_send_error(int error) noexcept -> TimedSendError {
     switch (error) {
     case EAGAIN:
       return TimedSendError::queue_full;
@@ -225,7 +229,7 @@ private:
       return TimedSendError::error_unknown;
     }
   }
-  static constexpr auto map_timed_receive_error(int error) noexcept -> TimedReceiveError {
+  [[nodiscard]] static constexpr auto map_timed_receive_error(int error) noexcept -> TimedReceiveError {
     switch (error) {
     case EAGAIN:
       return TimedReceiveError::queue_empty;
@@ -242,14 +246,15 @@ private:
     }
   }
 
-  static auto open(char const *name, OpenCreateMode mode, int permissions, ::mq_attr *attributes) noexcept
+  [[nodiscard]] static auto open(char const *name, OpenCreateMode mode, int permissions, ::mq_attr *attributes) noexcept
       -> tl::expected<mq, OpenError>;
 
-  auto set_attributes(long flags) noexcept -> ::mq_attr;
+  [[nodiscard]] auto set_attributes(long flags) noexcept -> ::mq_attr;
 
-  auto timed_send(char const *buffer, std::size_t len, ::timespec const *timeout, unsigned int priority) noexcept
+  [[nodiscard]] auto
+  timed_send(char const *buffer, std::size_t len, ::timespec const *timeout, unsigned int priority) noexcept
       -> tl::expected<void, TimedSendError>;
-  auto
+  [[nodiscard]] auto
   timed_receive(char *buffer, std::size_t len, ::timespec const *timeout, unsigned int *priority = nullptr) noexcept
       -> tl::expected<std::size_t, TimedReceiveError>;
 
