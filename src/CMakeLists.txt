@@ -4,7 +4,7 @@ include(use_conan)
 find_package(tl-expected REQUIRED)
 
 add_custom_command(OUTPUT "${CMAKE_BINARY_DIR}/include/ipcpp/sig_rt.hpp"
-  COMMAND "${CMAKE_COMMAND}" -E echo make_directory "${CMAKE_BINARY_DIR}/include/ipcpp"
+  COMMAND "${CMAKE_COMMAND}" -E make_directory "${CMAKE_BINARY_DIR}/include/ipcpp"
   COMMAND gensigrt "${CMAKE_BINARY_DIR}/include/ipcpp/sig_rt.hpp"
   DEPENDS gensigrt
 )
