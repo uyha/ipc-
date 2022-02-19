@@ -1,8 +1,7 @@
 include(build_options)
 include(use_conan)
 
-find_package(fmt)
-find_package(tl-expected)
+find_package(tl-expected REQUIRED)
 
 add_library(ipcpp-mq mq.cpp)
 add_library(ipcpp::mq ALIAS ipcpp-mq)
