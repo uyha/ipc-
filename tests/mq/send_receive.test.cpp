@@ -15,7 +15,7 @@ TEST_CASE("sending and reading attributes") {
       CHECK(attributes.mq_curmsgs == 1);
     }
     {
-      queue->set_nonblock();
+      (void)queue->set_nonblock();
       auto result = queue->send(name, 0);
       CHECK_FALSE(result);
       CHECK(result.error() == mq::SendError::queue_full);
@@ -49,7 +49,7 @@ TEST_CASE("reading empty nonblocking queue") {
   CHECK_FALSE(result);
   CHECK(result.error() == mq::ReceiveError::queue_empty);
 
-  mq::unlink(name);
+  CHECK(mq::unlink(name));
 }
 TEST_CASE("sending and reading from the same queue") {
   auto name     = "/send-receive";
@@ -88,5 +88,5 @@ TEST_CASE("sending and reading from the same queue") {
     }
   }
 
-  mq::unlink(name);
+  CHECK(mq::unlink(name));
 }

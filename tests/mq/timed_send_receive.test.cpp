@@ -23,7 +23,7 @@ TEST_CASE("timed sending nonblocking message queue") {
     CHECK(result.error() == mq::TimedSendError::queue_full);
   }
 
-  mq::unlink(name);
+  REQUIRE(mq::unlink(name));
 }
 
 TEST_CASE("timed sending blocking message queue") {
@@ -48,7 +48,7 @@ TEST_CASE("timed sending blocking message queue") {
     CHECK(result.error() == mq::TimedSendError::timeout_invalid);
   }
 
-  mq::unlink(name);
+  REQUIRE(mq::unlink(name));
 }
 
 TEST_CASE("timed receiving nonblocking message queue") {
@@ -57,7 +57,7 @@ TEST_CASE("timed receiving nonblocking message queue") {
   auto result = queue->receive(nullptr, 1, 2s);
   CHECK_FALSE(result);
   CHECK(result.error() == mq::TimedReceiveError::queue_empty);
-  mq::unlink(name);
+  REQUIRE(mq::unlink(name));
 }
 
 TEST_CASE("timed receiving blocking message queue") {
@@ -82,7 +82,7 @@ TEST_CASE("timed receiving blocking message queue") {
     CHECK_FALSE(result);
     CHECK(result.error() == mq::TimedReceiveError::timeout_invalid);
   }
-  mq::unlink(name);
+  REQUIRE(mq::unlink(name));
 }
 
 TEST_CASE("timed sending and receiving") {
@@ -93,7 +93,7 @@ TEST_CASE("timed sending and receiving") {
   {
     auto send_thread = std::thread{[&] {
       std::this_thread::sleep_for(0.1s);
-      queue->send(name, 1);
+      (void)queue->send(name, 1);
     }};
     {
       auto result = queue->receive(std::data(buffer), std::size(buffer), 0.2s);
@@ -105,10 +105,11 @@ TEST_CASE("timed sending and receiving") {
   {
     auto receive_thread = std::thread{[&] {
       std::this_thread::sleep_for(0.1s);
-      queue->receive(std::data(buffer), std::size(buffer));
+      (void)queue->receive(std::data(buffer), std::size(buffer));
     }};
     {
-      queue->send(name, 1);
+      CHECK(queue->send(name, 1));
+      CHECK(queue->get_attributes().mq_curmsgs == 1);
       auto result = queue->send(name, 1, 0.2s);
       CHECK(result);
     }
