@@ -103,7 +103,7 @@ auto mq::receive(char *buffer, std::size_t len, unsigned int *priority) noexcept
 
 auto mq::timed_send(char const *buffer, std::size_t len, ::timespec const *timeout, unsigned int priority) noexcept
     -> tl::expected<void, TimedSendError> {
-  if (auto const result = ::mq_timedsend(m_fd, buffer, len, priority, timeout); result != -1) {
+  if (auto const result = ::mq_timedsend(m_fd, buffer, len, priority, timeout); result == 0) {
     return {};
   } else {
     return tl::unexpected{map_timed_send_error(errno)};
