@@ -34,7 +34,7 @@ add_test(NAME [[mq invalid mode combination]]
   COMMAND "${CMAKE_CTEST_COMMAND}"
           --build-and-test ${CMAKE_CURRENT_LIST_DIR}/compilation ${CMAKE_CURRENT_BINARY_DIR}/compilation
           --build-generator ${CMAKE_GENERATOR}
-          --build-target mq-mode
+          --build-target mq-invalid-mode-combination
           --build-options "-DCMAKE_MODULE_PATH=${CMAKE_BINARY_DIR}/src"
                           "-DIPCPP_MQ=$<TARGET_FILE:lpipp::mq>"
                           "-DIPCPP_MQ_INCLUDE=${CMAKE_SOURCE_DIR}/include"
@@ -43,6 +43,38 @@ set_tests_properties([[mq invalid mode combination]]
   PROPERTIES
     PASS_REGULAR_EXPRESSION [[
 no match for ‘operator|’ (operand types are ‘const lpipp::mq::OpenMode’ and ‘const lpipp::mq::OpenMode’)
+]]
+)
+
+add_test(NAME [[mq copy assignment disabled]]
+  COMMAND "${CMAKE_CTEST_COMMAND}"
+          --build-and-test ${CMAKE_CURRENT_LIST_DIR}/compilation ${CMAKE_CURRENT_BINARY_DIR}/compilation
+          --build-generator ${CMAKE_GENERATOR}
+          --build-target mq-copy-assignment-disabled
+          --build-options "-DCMAKE_MODULE_PATH=${CMAKE_BINARY_DIR}/src"
+                          "-DIPCPP_MQ=$<TARGET_FILE:lpipp::mq>"
+                          "-DIPCPP_MQ_INCLUDE=${CMAKE_SOURCE_DIR}/include"
+)
+set_tests_properties([[mq copy assignment disabled]]
+  PROPERTIES
+    PASS_REGULAR_EXPRESSION [[
+use of deleted function ‘lpipp::mq::mq\(const lpipp::mq&\)’
+]]
+)
+
+add_test(NAME [[mq copy constructor disabled]]
+  COMMAND "${CMAKE_CTEST_COMMAND}"
+          --build-and-test ${CMAKE_CURRENT_LIST_DIR}/compilation ${CMAKE_CURRENT_BINARY_DIR}/compilation
+          --build-generator ${CMAKE_GENERATOR}
+          --build-target mq-copy-constructor-disabled
+          --build-options "-DCMAKE_MODULE_PATH=${CMAKE_BINARY_DIR}/src"
+                          "-DIPCPP_MQ=$<TARGET_FILE:lpipp::mq>"
+                          "-DIPCPP_MQ_INCLUDE=${CMAKE_SOURCE_DIR}/include"
+)
+set_tests_properties([[mq copy constructor disabled]]
+  PROPERTIES
+    PASS_REGULAR_EXPRESSION [[
+use of deleted function ‘lpipp::mq& lpipp::mq::operator=\(const lpipp::mq&\)’
 ]]
 )
 
