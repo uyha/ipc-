@@ -3,7 +3,6 @@
 #include "chrono.hpp"
 #include "macros.hpp"
 
-#include <asm-generic/errno.h>
 #include <fcntl.h>
 #include <filesystem>
 #include <mqueue.h>
@@ -128,6 +127,12 @@ public:
     return timed_receive(buffer, len, &timespec, priority);
   }
 
+  enum class NotiRegError : int { registration_existed, memory_insufficient, error_unknown };
+  [[nodiscard]] auto unregister_notification() noexcept -> tl::expected<void, NotiRegError>;
+  [[nodiscard]] auto register_notification() noexcept -> tl::expected<void, NotiRegError>;
+  [[nodiscard]] auto register_notification(void (*callback)(::sigval)) noexcept
+      -> tl::expected<void, NotiRegError>;
+
   mq(mq const &) = delete;
   auto operator=(mq const &) -> mq & = delete;
 
@@ -212,7 +217,6 @@ private:
       return ReceiveError::error_unknown;
     }
   }
-
   [[nodiscard]] static constexpr auto map_timed_send_error(int error) noexcept -> TimedSendError {
     switch (error) {
     case EAGAIN:
@@ -245,6 +249,16 @@ private:
       return TimedReceiveError::error_unknown;
     }
   }
+  [[nodiscard]] static constexpr auto map_notification_register_error(int error) -> NotiRegError {
+    switch (error) {
+    case EBUSY:
+      return NotiRegError::registration_existed;
+    case ENOMEM:
+      return NotiRegError::memory_insufficient;
+    default:
+      return NotiRegError::error_unknown;
+    }
+  }
 
   [[nodiscard]] static auto open(char const *name, OpenCreateMode mode, int permissions, ::mq_attr *attributes) noexcept
       -> tl::expected<mq, OpenError>;
@@ -257,6 +271,8 @@ private:
   [[nodiscard]] auto
   timed_receive(char *buffer, std::size_t len, ::timespec const *timeout, unsigned int *priority = nullptr) noexcept
       -> tl::expected<std::size_t, TimedReceiveError>;
+
+  auto notify();
 
   mq(int fd) noexcept;
 

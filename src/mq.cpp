@@ -1,6 +1,7 @@
 #include <errno.h>
 #include <ipcpp/mq.hpp>
 #include <mqueue.h>
+#include <signal.h>
 
 namespace ipcpp {
 auto mq::open(const char *name, OpenMode mode) noexcept -> tl::expected<mq, OpenError> {
@@ -116,6 +117,31 @@ auto mq::timed_receive(char *buffer, std::size_t len, ::timespec const *timeout,
   } else {
     return tl::unexpected{map_timed_receive_error(errno)};
   }
+}
+
+auto mq::unregister_notification() noexcept -> tl::expected<void, NotiRegError> {
+  if (auto result = ::mq_notify(m_fd, nullptr); result == 0) {
+    return {};
+  }
+  return tl::unexpected{map_notification_register_error(errno)};
+}
+auto mq::register_notification() noexcept -> tl::expected<void, NotiRegError> {
+  auto event         = ::sigevent{};
+  event.sigev_notify = SIGEV_NONE;
+  if (auto result = ::mq_notify(m_fd, &event); result == 0) {
+    return {};
+  }
+  return tl::unexpected{map_notification_register_error(errno)};
+}
+auto mq::register_notification(void (*callback)(::sigval)) noexcept -> tl::expected<void, NotiRegError> {
+  auto event                    = ::sigevent{};
+  event.sigev_notify            = SIGEV_THREAD;
+  event.sigev_notify_function   = callback;
+  event.sigev_notify_attributes = nullptr;
+  if (auto result = ::mq_notify(m_fd, &event); result == 0) {
+    return {};
+  }
+  return tl::unexpected{map_notification_register_error(errno)};
 }
 
 mq::mq(mq &&other) noexcept
