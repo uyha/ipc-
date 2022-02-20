@@ -169,6 +169,16 @@ auto mq::notify(::sigevent *event) noexcept -> tl::expected<void, NotifyError> {
   return tl::unexpected{map_notify_error(errno)};
 }
 
+auto mq::notify(int signal) noexcept -> tl::expected<void, SignalNotifyError> {
+  auto event         = ::sigevent{};
+  event.sigev_notify = SIGEV_SIGNAL;
+  event.sigev_signo  = signal;
+  if (auto result = ::mq_notify(m_fd, &event); result == 0) {
+    return {};
+  }
+  return tl::unexpected{map_signal_notify_error(errno)};
+}
+
 mq::mq(mq &&other) noexcept
     : m_fd{other.m_fd} {
   other.m_fd = -1;

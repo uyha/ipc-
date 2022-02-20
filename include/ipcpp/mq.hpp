@@ -139,6 +139,9 @@ public:
       -> tl::expected<void, NotifyError>;
   [[nodiscard]] auto notify(::sigevent *event) noexcept -> tl::expected<void, NotifyError>;
 
+  enum class SignalNotifyError : int { registration_existed, signal_invalid, memory_insufficient, error_unknown };
+  [[nodiscard]] auto notify(int signal) noexcept -> tl::expected<void, SignalNotifyError>;
+
   mq(mq const &) = delete;
   auto operator=(mq const &) -> mq & = delete;
 
@@ -263,6 +266,18 @@ private:
       return NotifyError::memory_insufficient;
     default:
       return NotifyError::error_unknown;
+    }
+  }
+  [[nodiscard]] static constexpr auto map_signal_notify_error(int error) -> SignalNotifyError {
+    switch (error) {
+    case EBUSY:
+      return SignalNotifyError::registration_existed;
+    case EINVAL:
+      return SignalNotifyError::signal_invalid;
+    case ENOMEM:
+      return SignalNotifyError::memory_insufficient;
+    default:
+      return SignalNotifyError::error_unknown;
     }
   }
 

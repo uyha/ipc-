@@ -1,4 +1,5 @@
 #include <catch2/catch.hpp>
+#include <csignal>
 #include <iostream>
 #include <ipcpp/mq.hpp>
 #include <thread>
@@ -11,6 +12,7 @@ using namespace std::chrono_literals;
 bool mq_thread_callback_called   = false;
 int mq_thread_callback_int       = 0;
 void *mq_thread_callback_pointer = nullptr;
+bool mq_signal_callback_called   = false;
 
 TEST_CASE("register notification of a message queue") {
   auto name                  = "/notification";
@@ -18,6 +20,7 @@ TEST_CASE("register notification of a message queue") {
   mq_thread_callback_called  = false;
   mq_thread_callback_int     = 0;
   mq_thread_callback_pointer = nullptr;
+  mq_signal_callback_called  = false;
 
   REQUIRE(queue);
 
@@ -39,41 +42,39 @@ TEST_CASE("register notification of a message queue") {
   }
 
   SECTION("register with thread callback") {
-    auto sending_thread   = std::thread([&] {
-      std::this_thread::sleep_for(10ms);
-      (void)queue->send(name, 1);
-    });
     auto const attributes = queue->get_attributes();
     REQUIRE(attributes.mq_curmsgs == 0);
     REQUIRE(queue->notify([](::sigval) { mq_thread_callback_called = true; }));
-    std::this_thread::sleep_for(20ms);
+    CHECK(queue->send(name, 1));
+    std::this_thread::sleep_for(1ms);
     CHECK(mq_thread_callback_called);
-    sending_thread.join();
   }
   SECTION("register with thread callback and having value in it") {
-    auto sending_thread   = std::thread([&] {
-      std::this_thread::sleep_for(10ms);
-      (void)queue->send(name, 1);
-    });
     auto const attributes = queue->get_attributes();
     REQUIRE(attributes.mq_curmsgs == 0);
     REQUIRE(queue->notify([](::sigval val) { mq_thread_callback_int = val.sival_int; }, 1));
-    std::this_thread::sleep_for(20ms);
+    CHECK(queue->send(name, 1));
+    std::this_thread::sleep_for(1ms);
     CHECK(mq_thread_callback_int == 1);
-    sending_thread.join();
   }
   SECTION("register with thread callback and having pointer in it") {
-    auto sending_thread   = std::thread([&] {
-      std::this_thread::sleep_for(10ms);
-      (void)queue->send(name, 1);
-    });
     auto const attributes = queue->get_attributes();
     REQUIRE(attributes.mq_curmsgs == 0);
-    REQUIRE(
-        queue->notify([](::sigval val) { mq_thread_callback_pointer = val.sival_ptr; }, (void *)0xFF));
-    std::this_thread::sleep_for(20ms);
+    REQUIRE(queue->notify([](::sigval val) { mq_thread_callback_pointer = val.sival_ptr; }, (void *)0xFF));
+    CHECK(queue->send(name, 1));
+    std::this_thread::sleep_for(1ms);
     CHECK(mq_thread_callback_pointer == (void *)0xFF);
-    sending_thread.join();
+  }
+  SECTION("register with invalid signal should fail") {
+    auto result = queue->notify(-1);
+    REQUIRE_FALSE(result);
+    REQUIRE(result.error() == mq::SignalNotifyError::signal_invalid);
+  }
+  SECTION("register and wait for signal to come") {
+    std::signal(SIGUSR1, [](int) { mq_signal_callback_called = true; });
+    REQUIRE(queue->notify(SIGUSR1));
+    REQUIRE(queue->send(name, 1));
+    REQUIRE(mq_signal_callback_called);
   }
 
   REQUIRE(mq::unlink(name));
