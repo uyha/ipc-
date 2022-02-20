@@ -9,5 +9,6 @@ target_sources(lpipp-mq-test PRIVATE
   send_receive.test.cpp
   timed_send_receive.test.cpp
   unlink.test.cpp
+  move.test.cpp
 )
 target_link_libraries(lpipp-mq-test PRIVATE lpipp::mq Threads::Threads)

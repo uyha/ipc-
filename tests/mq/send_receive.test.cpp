@@ -90,3 +90,23 @@ TEST_CASE("sending and reading from the same queue") {
 
   CHECK(mq::unlink(name));
 }
+TEST_CASE("sending/receiving from read/write only queues") {
+  SECTION("send to readonly queue") {
+    auto name  = "/mq.send-readonly-queue";
+    auto queue = mq::open(name, create | read_only, 0666);
+    REQUIRE(queue);
+    auto result = queue->send(name, 1);
+    CHECK_FALSE(result);
+    CHECK(result.error() == mq::SendError::queue_read_only);
+    CHECK(mq::unlink(name));
+  }
+  SECTION("read from writeonly queue") {
+    auto name  = "/mq.read-writeonly-queue";
+    auto queue = mq::open(name, create | write_only, 0666);
+    REQUIRE(queue);
+    auto result = queue->receive(nullptr, 1);
+    CHECK_FALSE(result);
+    CHECK(result.error() == mq::ReceiveError::queue_write_only);
+    CHECK(mq::unlink(name));
+  }
+}

@@ -47,8 +47,7 @@ public:
     too_many_system_files,
     queue_missing,
     memory_insufficient,
-    space_insufficient,
-    error_unknown,
+    space_insufficient
   };
 
   struct CreateAttributes {
@@ -76,29 +75,22 @@ public:
   open(char const *name, OpenCreateMode mode, int permissions, CreateAttributes attributes) noexcept
       -> tl::expected<mq, OpenError>;
 
-  enum class UnlinkError { permission_denied, name_too_long, queue_missing, error_unknown };
+  enum class UnlinkError { permission_denied, name_too_long, queue_missing };
   [[nodiscard]] static auto unlink(char const *name) noexcept -> tl::expected<void, UnlinkError>;
 
   [[nodiscard]] auto get_attributes() const noexcept -> ::mq_attr;
   [[nodiscard]] auto set_block() noexcept -> ::mq_attr;
   [[nodiscard]] auto set_nonblock() noexcept -> ::mq_attr;
 
-  enum class SendError : int { queue_full, interrupted, message_too_big, error_unknown };
+  enum class SendError : int { queue_full, queue_read_only, interrupted, message_too_big };
   [[nodiscard]] auto send(char const *buffer, std::size_t len, unsigned int priority = 0) noexcept
       -> tl::expected<void, SendError>;
 
-  enum class ReceiveError : int { queue_empty, interrupted, buffer_too_small, error_unknown };
+  enum class ReceiveError : int { queue_empty, queue_write_only, interrupted, buffer_too_small };
   [[nodiscard]] auto receive(char *buffer, std::size_t len, unsigned int *priority = nullptr) noexcept
       -> tl::expected<std::size_t, ReceiveError>;
 
-  enum class TimedSendError : int {
-    queue_full,
-    interrupted,
-    timeout_invalid,
-    message_too_big,
-    timedout,
-    error_unknown
-  };
+  enum class TimedSendError : int { queue_full, interrupted, timeout_invalid, message_too_big, timedout };
   template <typename DurationRep, typename DurationPeriod>
   [[nodiscard]] auto send(char const *buffer,
                           std::size_t len,
@@ -108,14 +100,7 @@ public:
     return timed_send(buffer, len, &timespec, priority);
   }
 
-  enum class TimedReceiveError : int {
-    queue_empty,
-    interrupted,
-    timeout_invalid,
-    buffer_too_small,
-    timedout,
-    error_unknown
-  };
+  enum class TimedReceiveError : int { queue_empty, interrupted, timeout_invalid, buffer_too_small, timedout };
   template <typename DurationRep, typename DurationPeriod>
   [[nodiscard]] auto receive(char *buffer,
                              std::size_t len,
@@ -126,7 +111,7 @@ public:
     return timed_receive(buffer, len, &timespec, priority);
   }
 
-  enum class NotifyError : int { registration_existed, memory_insufficient, error_unknown };
+  enum class NotifyError : int { registration_existed, memory_insufficient };
   [[nodiscard]] auto unnotify() noexcept -> tl::expected<void, NotifyError>;
   [[nodiscard]] auto notify() noexcept -> tl::expected<void, NotifyError>;
   [[nodiscard]] auto notify(void (*callback)(::sigval), ::pthread_attr_t *new_thread_attributes = nullptr) noexcept
@@ -139,7 +124,11 @@ public:
       -> tl::expected<void, NotifyError>;
   [[nodiscard]] auto notify(::sigevent *event) noexcept -> tl::expected<void, NotifyError>;
 
-  enum class SignalNotifyError : int { registration_existed, signal_invalid, memory_insufficient, error_unknown };
+  enum class SignalNotifyError : int {
+    registration_existed,
+    signal_invalid,
+    memory_insufficient,
+  };
   [[nodiscard]] auto notify(int signal) noexcept -> tl::expected<void, SignalNotifyError>;
 
   mq(mq const &) = delete;
@@ -187,7 +176,7 @@ private:
     case ENOSPC:
       return OpenError::space_insufficient;
     default:
-      return OpenError::error_unknown;
+      return static_cast<OpenError>(error);
     }
   }
   [[nodiscard]] static constexpr auto map_unlink_error(int error) noexcept -> UnlinkError {
@@ -199,31 +188,35 @@ private:
     case ENOENT:
       return UnlinkError::queue_missing;
     default:
-      return UnlinkError::error_unknown;
+      return static_cast<UnlinkError>(error);
     }
   }
   [[nodiscard]] static constexpr auto map_send_error(int error) noexcept -> SendError {
     switch (error) {
     case EAGAIN:
       return SendError::queue_full;
+    case EBADF:
+      return SendError::queue_read_only;
     case EINTR:
       return SendError::interrupted;
     case EMSGSIZE:
       return SendError::message_too_big;
     default:
-      return SendError::error_unknown;
+      return static_cast<SendError>(error);
     }
   }
   [[nodiscard]] static constexpr auto map_receive_error(int error) noexcept -> ReceiveError {
     switch (error) {
     case EAGAIN:
       return ReceiveError::queue_empty;
+    case EBADF:
+      return ReceiveError::queue_write_only;
     case EINTR:
       return ReceiveError::interrupted;
     case EMSGSIZE:
       return ReceiveError::buffer_too_small;
     default:
-      return ReceiveError::error_unknown;
+      return static_cast<ReceiveError>(error);
     }
   }
   [[nodiscard]] static constexpr auto map_timed_send_error(int error) noexcept -> TimedSendError {
@@ -239,7 +232,7 @@ private:
     case ETIMEDOUT:
       return TimedSendError::timedout;
     default:
-      return TimedSendError::error_unknown;
+      return static_cast<TimedSendError>(error);
     }
   }
   [[nodiscard]] static constexpr auto map_timed_receive_error(int error) noexcept -> TimedReceiveError {
@@ -255,7 +248,7 @@ private:
     case ETIMEDOUT:
       return TimedReceiveError::timedout;
     default:
-      return TimedReceiveError::error_unknown;
+      return static_cast<TimedReceiveError>(error);
     }
   }
   [[nodiscard]] static constexpr auto map_notify_error(int error) -> NotifyError {
@@ -265,7 +258,7 @@ private:
     case ENOMEM:
       return NotifyError::memory_insufficient;
     default:
-      return NotifyError::error_unknown;
+      return static_cast<NotifyError>(error);
     }
   }
   [[nodiscard]] static constexpr auto map_signal_notify_error(int error) -> SignalNotifyError {
@@ -277,7 +270,7 @@ private:
     case ENOMEM:
       return SignalNotifyError::memory_insufficient;
     default:
-      return SignalNotifyError::error_unknown;
+      return static_cast<SignalNotifyError>(error);
     }
   }
 
