@@ -5,7 +5,7 @@
 int main(int argc, char **argv) {
   FILE *file          = fopen(argv[1], "w+");
   char const format[] = "#pragma once\n"
-                        "namespace ipcpp {\n"
+                        "namespace lpipp {\n"
                         "constexpr auto signal_realtime_min = %d;\n"
                         "constexpr auto signal_realtime_max = %d;\n"
                         "}";

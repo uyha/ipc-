@@ -1,38 +1,38 @@
 #include <catch2/catch.hpp>
-#include <ipcpp/mq.hpp>
+#include <lpipp/mq.hpp>
 
 namespace fs = std::filesystem;
-using namespace ipcpp;
+using namespace lpipp;
 using namespace mq_constants;
 
 TEST_CASE("opening a message queue") {
-  auto const name = "/ipcpp-open-mq-test";
+  auto const name = "/lpipp-open-mq-test";
 
   SECTION("creating a message queue while at it") {
     auto permissions   = fs::perms::owner_read;
     auto mode          = read_only | create;
-    auto message_queue = ipcpp::mq::open(name, mode, permissions);
+    auto message_queue = lpipp::mq::open(name, mode, permissions);
     CHECK(message_queue);
     CHECK(mq::unlink(name).has_value());
   }
   SECTION("creating a message queue with permissions being octet") {
     auto mode          = read_only | create;
-    auto message_queue = ipcpp::mq::open(name, mode, 0666);
+    auto message_queue = lpipp::mq::open(name, mode, 0666);
     CHECK(message_queue);
     CHECK(mq::unlink(name).has_value());
   }
   SECTION("creating an already existing queue") {
     auto mode          = read_only | create;
-    auto message_queue = ipcpp::mq::open(name, mode, 0666);
+    auto message_queue = lpipp::mq::open(name, mode, 0666);
     CHECK(message_queue);
-    auto dup_message_queue = ipcpp::mq::open(name, read_only | create | exclusive, 0666);
+    auto dup_message_queue = lpipp::mq::open(name, read_only | create | exclusive, 0666);
     CHECK_FALSE(dup_message_queue);
     CHECK(dup_message_queue.error() == mq::OpenError::queue_existed);
     CHECK(mq::unlink(name).has_value());
   }
   SECTION("opening non existing queue without creating it") {
     auto mode          = read_only;
-    auto message_queue = ipcpp::mq::open(name, mode);
+    auto message_queue = lpipp::mq::open(name, mode);
     CHECK_FALSE(message_queue);
     CHECK(message_queue.error() == mq::OpenError::queue_missing);
   }
@@ -40,7 +40,7 @@ TEST_CASE("opening a message queue") {
     auto permissions          = fs::perms::owner_read;
     auto mode                 = read_only | create;
     auto invalid_max_messages = mq::CreateAttributes{.max_messages = 0, .max_message_size = 1};
-    auto message_queue        = ipcpp::mq::open(name, mode, permissions, invalid_max_messages);
+    auto message_queue        = lpipp::mq::open(name, mode, permissions, invalid_max_messages);
     CHECK_FALSE(message_queue);
     CHECK(message_queue.error() == mq::OpenError::attribute_invalid);
   }
@@ -48,7 +48,7 @@ TEST_CASE("opening a message queue") {
     auto permissions          = fs::perms::owner_read;
     auto mode                 = read_only | create;
     auto invalid_message_size = mq::CreateAttributes{.max_messages = 1, .max_message_size = 0};
-    auto message_queue        = ipcpp::mq::open(name, mode, permissions, invalid_message_size);
+    auto message_queue        = lpipp::mq::open(name, mode, permissions, invalid_message_size);
     CHECK_FALSE(message_queue);
     CHECK(message_queue.error() == mq::OpenError::attribute_invalid);
   }

@@ -1,7 +1,7 @@
 #include <catch2/catch.hpp>
-#include <ipcpp/mq.hpp>
+#include <lpipp/mq.hpp>
 
-using namespace ipcpp;
+using namespace lpipp;
 using namespace mq_constants;
 
 TEST_CASE("getting attribute of a queue") {

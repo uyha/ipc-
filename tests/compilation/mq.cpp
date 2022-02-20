@@ -1,5 +1,5 @@
-#include <ipcpp/mq.hpp>
+#include <lpipp/mq.hpp>
 int main() {
-  using namespace ipcpp::mq_constants;
+  using namespace lpipp::mq_constants;
   read_only | write_only;
 }

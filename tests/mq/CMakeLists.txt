@@ -1,7 +1,7 @@
 find_package(Threads REQUIRED)
 
-construct_test(ipcpp-mq-test)
-target_sources(ipcpp-mq-test PRIVATE
+construct_test(lpipp-mq-test)
+target_sources(lpipp-mq-test PRIVATE
   attribute.test.cpp
   mode.test.cpp
   notify.test.cpp
@@ -10,4 +10,4 @@ target_sources(ipcpp-mq-test PRIVATE
   timed_send_receive.test.cpp
   unlink.test.cpp
 )
-target_link_libraries(ipcpp-mq-test PRIVATE ipcpp::mq Threads::Threads)
+target_link_libraries(lpipp-mq-test PRIVATE lpipp::mq Threads::Threads)

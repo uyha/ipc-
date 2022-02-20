@@ -1,10 +1,10 @@
 #define CATCH_CONFIG_ENABLE_CHRONO_STRINGMAKER
 
 #include <catch2/catch.hpp>
-#include <ipcpp/mq.hpp>
+#include <lpipp/mq.hpp>
 #include <thread>
 
-using namespace ipcpp;
+using namespace lpipp;
 using namespace mq_constants;
 using namespace std::chrono;
 using namespace std::chrono_literals;

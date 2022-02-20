@@ -8,7 +8,7 @@
 #include <pthread.h>
 #include <tl/expected.hpp>
 
-namespace ipcpp {
+namespace lpipp {
 class mq {
 public:
   enum class OpenMode : int {
@@ -306,4 +306,4 @@ static constexpr mq::CreateMode exclusive    = mq::CreateMode::exclusive;
 static constexpr mq::ExtraFlag close_on_exec = mq::ExtraFlag::close_on_exec;
 static constexpr mq::ExtraFlag nonblock      = mq::ExtraFlag::nonblock;
 } // namespace mq_constants
-} // namespace ipcpp
+} // namespace lpipp

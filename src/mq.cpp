@@ -1,9 +1,9 @@
 #include <errno.h>
-#include <ipcpp/mq.hpp>
+#include <lpipp/mq.hpp>
 #include <mqueue.h>
 #include <signal.h>
 
-namespace ipcpp {
+namespace lpipp {
 auto mq::open(const char *name, OpenMode mode) noexcept -> tl::expected<mq, OpenError> {
   using tl::unexpected, tl::expected;
 
@@ -201,4 +201,4 @@ mq::~mq() noexcept {
 
 mq::mq(int fd) noexcept
     : m_fd{fd} {}
-} // namespace ipcpp
+} // namespace lpipp

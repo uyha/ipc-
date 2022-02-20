@@ -3,7 +3,7 @@
 #include <bits/types/struct_timespec.h>
 #include <chrono>
 
-namespace ipcpp {
+namespace lpipp {
 template <typename Duration>
 constexpr auto to_timespec(std::chrono::time_point<std::chrono::system_clock, Duration> const &timepoint) noexcept
     -> ::timespec {
@@ -16,4 +16,4 @@ constexpr auto to_timespec(std::chrono::time_point<std::chrono::system_clock, Du
 
   return {.tv_sec = sec, .tv_nsec = nsec};
 }
-} // namespace ipcpp
+} // namespace lpipp

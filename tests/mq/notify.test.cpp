@@ -1,11 +1,11 @@
 #include <catch2/catch.hpp>
 #include <csignal>
 #include <iostream>
-#include <ipcpp/mq.hpp>
+#include <lpipp/mq.hpp>
 #include <thread>
 #include <unistd.h>
 
-using namespace ipcpp;
+using namespace lpipp;
 using namespace mq_constants;
 using namespace std::chrono_literals;
 

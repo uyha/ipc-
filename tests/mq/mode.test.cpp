@@ -1,7 +1,7 @@
 #include <catch2/catch.hpp>
-#include <ipcpp/mq.hpp>
+#include <lpipp/mq.hpp>
 
-using namespace ipcpp::mq_constants;
+using namespace lpipp::mq_constants;
 
 TEST_CASE("open mode combinations") {
   REQUIRE(static_cast<int>(read_only) == (O_RDONLY));
