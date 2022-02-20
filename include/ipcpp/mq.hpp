@@ -3,11 +3,10 @@
 #include "chrono.hpp"
 #include "macros.hpp"
 
-#include <fcntl.h>
 #include <filesystem>
 #include <mqueue.h>
+#include <pthread.h>
 #include <tl/expected.hpp>
-#include <type_traits>
 
 namespace ipcpp {
 class mq {
@@ -127,11 +126,18 @@ public:
     return timed_receive(buffer, len, &timespec, priority);
   }
 
-  enum class NotiRegError : int { registration_existed, memory_insufficient, error_unknown };
-  [[nodiscard]] auto unregister_notification() noexcept -> tl::expected<void, NotiRegError>;
-  [[nodiscard]] auto register_notification() noexcept -> tl::expected<void, NotiRegError>;
-  [[nodiscard]] auto register_notification(void (*callback)(::sigval)) noexcept
-      -> tl::expected<void, NotiRegError>;
+  enum class NotifyError : int { registration_existed, memory_insufficient, error_unknown };
+  [[nodiscard]] auto unnotify() noexcept -> tl::expected<void, NotifyError>;
+  [[nodiscard]] auto notify() noexcept -> tl::expected<void, NotifyError>;
+  [[nodiscard]] auto notify(void (*callback)(::sigval), ::pthread_attr_t *new_thread_attributes = nullptr) noexcept
+      -> tl::expected<void, NotifyError>;
+  [[nodiscard]] auto
+  notify(void (*callback)(::sigval), int value, ::pthread_attr_t *new_thread_attributes = nullptr) noexcept
+      -> tl::expected<void, NotifyError>;
+  [[nodiscard]] auto
+  notify(void (*callback)(::sigval), void *pointer, ::pthread_attr_t *new_thread_attributes = nullptr) noexcept
+      -> tl::expected<void, NotifyError>;
+  [[nodiscard]] auto notify(::sigevent *event) noexcept -> tl::expected<void, NotifyError>;
 
   mq(mq const &) = delete;
   auto operator=(mq const &) -> mq & = delete;
@@ -249,14 +255,14 @@ private:
       return TimedReceiveError::error_unknown;
     }
   }
-  [[nodiscard]] static constexpr auto map_notification_register_error(int error) -> NotiRegError {
+  [[nodiscard]] static constexpr auto map_notify_error(int error) -> NotifyError {
     switch (error) {
     case EBUSY:
-      return NotiRegError::registration_existed;
+      return NotifyError::registration_existed;
     case ENOMEM:
-      return NotiRegError::memory_insufficient;
+      return NotifyError::memory_insufficient;
     default:
-      return NotiRegError::error_unknown;
+      return NotifyError::error_unknown;
     }
   }
 
@@ -271,8 +277,6 @@ private:
   [[nodiscard]] auto
   timed_receive(char *buffer, std::size_t len, ::timespec const *timeout, unsigned int *priority = nullptr) noexcept
       -> tl::expected<std::size_t, TimedReceiveError>;
-
-  auto notify();
 
   mq(int fd) noexcept;
 

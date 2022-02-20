@@ -119,29 +119,54 @@ auto mq::timed_receive(char *buffer, std::size_t len, ::timespec const *timeout,
   }
 }
 
-auto mq::unregister_notification() noexcept -> tl::expected<void, NotiRegError> {
+auto mq::unnotify() noexcept -> tl::expected<void, NotifyError> {
   if (auto result = ::mq_notify(m_fd, nullptr); result == 0) {
     return {};
   }
-  return tl::unexpected{map_notification_register_error(errno)};
+  return tl::unexpected{map_notify_error(errno)};
 }
-auto mq::register_notification() noexcept -> tl::expected<void, NotiRegError> {
+auto mq::notify() noexcept -> tl::expected<void, NotifyError> {
   auto event         = ::sigevent{};
   event.sigev_notify = SIGEV_NONE;
   if (auto result = ::mq_notify(m_fd, &event); result == 0) {
     return {};
   }
-  return tl::unexpected{map_notification_register_error(errno)};
+  return tl::unexpected{map_notify_error(errno)};
 }
-auto mq::register_notification(void (*callback)(::sigval)) noexcept -> tl::expected<void, NotiRegError> {
+auto mq::notify(void (*callback)(::sigval), ::pthread_attr_t *new_thread_attributes) noexcept
+    -> tl::expected<void, NotifyError> {
   auto event                    = ::sigevent{};
   event.sigev_notify            = SIGEV_THREAD;
   event.sigev_notify_function   = callback;
-  event.sigev_notify_attributes = nullptr;
-  if (auto result = ::mq_notify(m_fd, &event); result == 0) {
+  event.sigev_notify_attributes = new_thread_attributes;
+
+  return notify(&event);
+}
+auto mq::notify(void (*callback)(::sigval), int value, ::pthread_attr_t *new_thread_attributes) noexcept
+    -> tl::expected<void, NotifyError> {
+  auto event                    = ::sigevent{};
+  event.sigev_notify            = SIGEV_THREAD;
+  event.sigev_notify_function   = callback;
+  event.sigev_notify_attributes = new_thread_attributes;
+  event.sigev_value.sival_int   = value;
+
+  return notify(&event);
+}
+auto mq::notify(void (*callback)(::sigval), void *pointer, ::pthread_attr_t *new_thread_attributes) noexcept
+    -> tl::expected<void, NotifyError> {
+  auto event                    = ::sigevent{};
+  event.sigev_notify            = SIGEV_THREAD;
+  event.sigev_notify_function   = callback;
+  event.sigev_notify_attributes = new_thread_attributes;
+  event.sigev_value.sival_ptr   = pointer;
+
+  return notify(&event);
+}
+auto mq::notify(::sigevent *event) noexcept -> tl::expected<void, NotifyError> {
+  if (auto result = ::mq_notify(m_fd, event); result == 0) {
     return {};
   }
-  return tl::unexpected{map_notification_register_error(errno)};
+  return tl::unexpected{map_notify_error(errno)};
 }
 
 mq::mq(mq &&other) noexcept
