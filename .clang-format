@@ -3,6 +3,7 @@ BasedOnStyle: LLVM
 AlignConsecutiveAssignments: true
 AlignOperands: AlignAfterOperator
 AllowShortFunctionsOnASingleLine: Empty
+AllowShortCaseLabelsOnASingleLine: true
 AlwaysBreakTemplateDeclarations: Yes
 BinPackArguments: false
 BinPackParameters: false
