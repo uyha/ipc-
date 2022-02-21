@@ -1,4 +1,3 @@
-#include <errno.h>
 #include <lpipp/mq.hpp>
 #include <mqueue.h>
 #include <signal.h>
@@ -199,6 +198,6 @@ mq::~mq() noexcept {
   ::mq_close(m_fd);
 }
 
-mq::mq(int fd) noexcept
-    : m_fd{fd} {}
+mq::mq(int target_fd) noexcept
+    : m_fd{target_fd} {}
 } // namespace lpipp

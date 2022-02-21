@@ -1,6 +1,7 @@
 #pragma once
 
 #include "chrono.hpp"
+#include "fd.hpp"
 #include "macros.hpp"
 
 #include <filesystem>
@@ -9,7 +10,7 @@
 #include <tl/expected.hpp>
 
 namespace lpipp {
-class mq {
+class mq : public fd<mq> {
 public:
   enum class OpenMode : int {
     read_only  = O_RDONLY,
@@ -243,9 +244,11 @@ private:
   timed_receive(char *buffer, std::size_t len, ::timespec const *timeout, unsigned int *priority = nullptr) noexcept
       -> tl::expected<std::size_t, TimedReceiveError>;
 
-  mq(int fd) noexcept;
+  mq(int target_fd) noexcept;
 
   int m_fd;
+
+  friend fd<mq>;
 };
 namespace mq_constants {
 static constexpr mq::OpenMode read_only      = mq::OpenMode::read_only;

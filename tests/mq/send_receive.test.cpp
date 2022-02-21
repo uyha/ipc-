@@ -110,3 +110,34 @@ TEST_CASE("sending/receiving from read/write only queues") {
     CHECK(mq::unlink(name));
   }
 }
+TEST_CASE("duplicate then send and receive") {
+  SECTION("send from original and receive from duplicated") {
+    auto name           = "/mq.dup.send-receive";
+    auto buffer         = std::array<char, 5>{};
+    auto original_queue = mq::open(name, create | read_write, 0666, {.max_messages = 1, .max_message_size = 1});
+    REQUIRE(original_queue);
+    auto dup_queue = original_queue->duplicate();
+    REQUIRE(dup_queue);
+    REQUIRE(original_queue->send("s", 1));
+    auto result = dup_queue->receive(std::data(buffer), std::size(buffer));
+    CHECK(result);
+    CHECK(std::get<0>(buffer) == 's');
+
+    CHECK(mq::unlink(name));
+  }
+  SECTION("send from original and receive from duplicated and check file descriptor") {
+    auto name           = "/mq.dup-at-least.send-receive";
+    auto buffer         = std::array<char, 5>{};
+    auto original_queue = mq::open(name, create | read_write, 0666, {.max_messages = 1, .max_message_size = 1});
+    REQUIRE(original_queue);
+    auto dup_queue = original_queue->duplicate_at_least(10);
+    REQUIRE(dup_queue);
+    CHECK(dup_queue->get_handle() >= 10);
+    REQUIRE(original_queue->send("s", 1));
+    auto result = dup_queue->receive(std::data(buffer), std::size(buffer));
+    CHECK(result);
+    CHECK(std::get<0>(buffer) == 's');
+
+    CHECK(mq::unlink(name));
+  }
+}
