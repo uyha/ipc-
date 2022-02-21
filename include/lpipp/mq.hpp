@@ -26,16 +26,16 @@ public:
     nonblock      = O_NONBLOCK,
   };
 
-  IPCPP_BITOR_OP(OpenMode, ExtraFlag, OpenMode)
-  IPCPP_BITOR_OP(OpenMode, CreateMode, OpenCreateMode)
+  LPIPP_BITOR_OP(OpenMode, ExtraFlag, OpenMode)
+  LPIPP_BITOR_OP(OpenMode, CreateMode, OpenCreateMode)
 
-  IPCPP_BITOR_OP(ExtraFlag, ExtraFlag)
+  LPIPP_BITOR_OP(ExtraFlag, ExtraFlag)
 
-  IPCPP_BITOR_OP(CreateMode, CreateMode)
-  IPCPP_BITOR_OP(CreateMode, ExtraFlag, CreateMode)
+  LPIPP_BITOR_OP(CreateMode, CreateMode)
+  LPIPP_BITOR_OP(CreateMode, ExtraFlag, CreateMode)
 
-  IPCPP_BITOR_OP(OpenCreateMode, CreateMode, OpenCreateMode)
-  IPCPP_BITOR_OP(OpenCreateMode, ExtraFlag, OpenCreateMode)
+  LPIPP_BITOR_OP(OpenCreateMode, CreateMode, OpenCreateMode)
+  LPIPP_BITOR_OP(OpenCreateMode, ExtraFlag, OpenCreateMode)
 
   enum class OpenError {
     permission_denied,
@@ -157,120 +157,77 @@ private:
   }
   [[nodiscard]] static constexpr auto map_open_error(int error) noexcept -> OpenError {
     switch (error) {
-    case EACCES:
-      return OpenError::permission_denied;
-    case EEXIST:
-      return OpenError::queue_existed;
-    case EINVAL:
-      return OpenError::attribute_invalid;
-    case EMFILE:
-      return OpenError::too_many_process_files;
-    case ENAMETOOLONG:
-      return OpenError::name_too_long;
-    case ENFILE:
-      return OpenError::too_many_system_files;
-    case ENOENT:
-      return OpenError::queue_missing;
-    case ENOMEM:
-      return OpenError::memory_insufficient;
-    case ENOSPC:
-      return OpenError::space_insufficient;
-    default:
-      return static_cast<OpenError>(error);
+    case EACCES: return OpenError::permission_denied;
+    case EEXIST: return OpenError::queue_existed;
+    case EINVAL: return OpenError::attribute_invalid;
+    case EMFILE: return OpenError::too_many_process_files;
+    case ENAMETOOLONG: return OpenError::name_too_long;
+    case ENFILE: return OpenError::too_many_system_files;
+    case ENOENT: return OpenError::queue_missing;
+    case ENOMEM: return OpenError::memory_insufficient;
+    case ENOSPC: return OpenError::space_insufficient;
+    default: return static_cast<OpenError>(error);
     }
   }
   [[nodiscard]] static constexpr auto map_unlink_error(int error) noexcept -> UnlinkError {
     switch (error) {
-    case EACCES:
-      return UnlinkError::permission_denied;
-    case ENAMETOOLONG:
-      return UnlinkError::name_too_long;
-    case ENOENT:
-      return UnlinkError::queue_missing;
-    default:
-      return static_cast<UnlinkError>(error);
+    case EACCES: return UnlinkError::permission_denied;
+    case ENAMETOOLONG: return UnlinkError::name_too_long;
+    case ENOENT: return UnlinkError::queue_missing;
+    default: return static_cast<UnlinkError>(error);
     }
   }
   [[nodiscard]] static constexpr auto map_send_error(int error) noexcept -> SendError {
     switch (error) {
-    case EAGAIN:
-      return SendError::queue_full;
-    case EBADF:
-      return SendError::queue_read_only;
-    case EINTR:
-      return SendError::interrupted;
-    case EMSGSIZE:
-      return SendError::message_too_big;
-    default:
-      return static_cast<SendError>(error);
+    case EAGAIN: return SendError::queue_full;
+    case EBADF: return SendError::queue_read_only;
+    case EINTR: return SendError::interrupted;
+    case EMSGSIZE: return SendError::message_too_big;
+    default: return static_cast<SendError>(error);
     }
   }
   [[nodiscard]] static constexpr auto map_receive_error(int error) noexcept -> ReceiveError {
     switch (error) {
-    case EAGAIN:
-      return ReceiveError::queue_empty;
-    case EBADF:
-      return ReceiveError::queue_write_only;
-    case EINTR:
-      return ReceiveError::interrupted;
-    case EMSGSIZE:
-      return ReceiveError::buffer_too_small;
-    default:
-      return static_cast<ReceiveError>(error);
+    case EAGAIN: return ReceiveError::queue_empty;
+    case EBADF: return ReceiveError::queue_write_only;
+    case EINTR: return ReceiveError::interrupted;
+    case EMSGSIZE: return ReceiveError::buffer_too_small;
+    default: return static_cast<ReceiveError>(error);
     }
   }
   [[nodiscard]] static constexpr auto map_timed_send_error(int error) noexcept -> TimedSendError {
     switch (error) {
-    case EAGAIN:
-      return TimedSendError::queue_full;
-    case EINTR:
-      return TimedSendError::interrupted;
-    case EINVAL:
-      return TimedSendError::timeout_invalid;
-    case EMSGSIZE:
-      return TimedSendError::message_too_big;
-    case ETIMEDOUT:
-      return TimedSendError::timedout;
-    default:
-      return static_cast<TimedSendError>(error);
+    case EAGAIN: return TimedSendError::queue_full;
+    case EINTR: return TimedSendError::interrupted;
+    case EINVAL: return TimedSendError::timeout_invalid;
+    case EMSGSIZE: return TimedSendError::message_too_big;
+    case ETIMEDOUT: return TimedSendError::timedout;
+    default: return static_cast<TimedSendError>(error);
     }
   }
   [[nodiscard]] static constexpr auto map_timed_receive_error(int error) noexcept -> TimedReceiveError {
     switch (error) {
-    case EAGAIN:
-      return TimedReceiveError::queue_empty;
-    case EINTR:
-      return TimedReceiveError::interrupted;
-    case EINVAL:
-      return TimedReceiveError::timeout_invalid;
-    case EMSGSIZE:
-      return TimedReceiveError::buffer_too_small;
-    case ETIMEDOUT:
-      return TimedReceiveError::timedout;
-    default:
-      return static_cast<TimedReceiveError>(error);
+    case EAGAIN: return TimedReceiveError::queue_empty;
+    case EINTR: return TimedReceiveError::interrupted;
+    case EINVAL: return TimedReceiveError::timeout_invalid;
+    case EMSGSIZE: return TimedReceiveError::buffer_too_small;
+    case ETIMEDOUT: return TimedReceiveError::timedout;
+    default: return static_cast<TimedReceiveError>(error);
     }
   }
   [[nodiscard]] static constexpr auto map_notify_error(int error) -> NotifyError {
     switch (error) {
-    case EBUSY:
-      return NotifyError::registration_existed;
-    case ENOMEM:
-      return NotifyError::memory_insufficient;
-    default:
-      return static_cast<NotifyError>(error);
+    case EBUSY: return NotifyError::registration_existed;
+    case ENOMEM: return NotifyError::memory_insufficient;
+    default: return static_cast<NotifyError>(error);
     }
   }
   [[nodiscard]] static constexpr auto map_signal_notify_error(int error) -> SignalNotifyError {
     switch (error) {
-    case EBUSY:
-      return SignalNotifyError::registration_existed;
-    case EINVAL:
-      return SignalNotifyError::signal_invalid;
-    case ENOMEM:
-      return SignalNotifyError::memory_insufficient;
-    default:
-      return static_cast<SignalNotifyError>(error);
+    case EBUSY: return SignalNotifyError::registration_existed;
+    case EINVAL: return SignalNotifyError::signal_invalid;
+    case ENOMEM: return SignalNotifyError::memory_insufficient;
+    default: return static_cast<SignalNotifyError>(error);
     }
   }
 
