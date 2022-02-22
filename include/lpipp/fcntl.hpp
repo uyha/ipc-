@@ -27,7 +27,7 @@ enum class DupAtLeastError : int { fd_invalid, fd_limit_reached };
 }
 
 template <typename T>
-class fd {
+class fcntl {
 public:
   auto get_handle() const noexcept -> int {
     return static_cast<T const &>(*this).m_fd;

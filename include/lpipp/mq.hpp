@@ -1,7 +1,7 @@
 #pragma once
 
 #include "chrono.hpp"
-#include "fd.hpp"
+#include "fcntl.hpp"
 #include "macros.hpp"
 
 #include <filesystem>
@@ -10,7 +10,7 @@
 #include <tl/expected.hpp>
 
 namespace lpipp {
-class mq : public fd<mq> {
+class mq : public fcntl<mq> {
 public:
   enum class OpenMode : int {
     read_only  = O_RDONLY,
@@ -248,7 +248,7 @@ private:
 
   int m_fd;
 
-  friend fd<mq>;
+  friend fcntl<mq>;
 };
 namespace mq_constants {
 static constexpr mq::OpenMode read_only      = mq::OpenMode::read_only;
