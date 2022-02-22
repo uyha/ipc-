@@ -32,7 +32,8 @@ public:
   auto get_handle() const noexcept -> int {
     return static_cast<T const &>(*this).m_fd;
   }
-  auto duplicate() const noexcept -> tl::expected<T, DupError> {
+
+  [[nodiscard]] auto duplicate() const noexcept -> tl::expected<T, DupError> {
     auto new_fd = ::dup(get_handle());
     if (new_fd == -1) {
       return tl::unexpected{map_dup_error(errno)};
@@ -40,7 +41,7 @@ public:
     return T{new_fd};
   }
 
-  auto duplicate_at_least(int minimum_fd) const noexcept -> tl::expected<T, DupAtLeastError> {
+  [[nodiscard]] auto duplicate_at_least(int minimum_fd) const noexcept -> tl::expected<T, DupAtLeastError> {
     auto new_fd = ::fcntl(get_handle(), F_DUPFD, minimum_fd);
     if (new_fd == -1) {
       return tl::unexpected{map_dup_at_least_error(errno)};
