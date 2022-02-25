@@ -17,12 +17,22 @@
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
       },
       "environment": {}
-    }
+    },
+    { "name": "dummy", "binaryDir": "${sourceDir}/build/tests" }
   ],
   "buildPresets": [
     {
       "name": "default",
       "configurePreset": "default"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "default",
+      "configurePreset": "dummy",
+      "output": {
+        "outputOnFailure": true
+      }
     }
   ]
 }
