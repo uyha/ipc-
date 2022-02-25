@@ -4,7 +4,7 @@
 
 namespace lpipp {
 auto mq::open(const char *name, OpenMode mode) noexcept -> tl::expected<mq, OpenError> {
-  using tl::unexpected, tl::expected;
+  using tl::unexpected;
 
   if (not valid_name(name)) {
     return unexpected{OpenError::name_invalid};
