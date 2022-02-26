@@ -251,12 +251,12 @@ private:
   friend fcntl<mq>;
 };
 namespace mq_constants {
-static constexpr mq::OpenMode read_only      = mq::OpenMode::read_only;
-static constexpr mq::OpenMode write_only     = mq::OpenMode::write_only;
-static constexpr mq::OpenMode read_write     = mq::OpenMode::read_write;
-static constexpr mq::CreateMode create       = mq::CreateMode::create;
-static constexpr mq::CreateMode exclusive    = mq::CreateMode::exclusive;
-static constexpr mq::ExtraFlag close_on_exec = mq::ExtraFlag::close_on_exec;
-static constexpr mq::ExtraFlag nonblock      = mq::ExtraFlag::nonblock;
+constexpr mq::OpenMode read_only      = mq::OpenMode::read_only;
+constexpr mq::OpenMode write_only     = mq::OpenMode::write_only;
+constexpr mq::OpenMode read_write     = mq::OpenMode::read_write;
+constexpr mq::CreateMode create       = mq::CreateMode::create;
+constexpr mq::CreateMode exclusive    = mq::CreateMode::exclusive;
+constexpr mq::ExtraFlag close_on_exec = mq::ExtraFlag::close_on_exec;
+constexpr mq::ExtraFlag nonblock      = mq::ExtraFlag::nonblock;
 } // namespace mq_constants
 } // namespace lpipp
