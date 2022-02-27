@@ -3,12 +3,6 @@ include(use_conan)
 
 find_package(tl-expected REQUIRED)
 
-add_custom_command(OUTPUT "${CMAKE_BINARY_DIR}/include/lpipp/sig_rt.hpp"
-  COMMAND "${CMAKE_COMMAND}" -E make_directory "${CMAKE_BINARY_DIR}/include/lpipp"
-  COMMAND gensigrt "${CMAKE_BINARY_DIR}/include/lpipp/sig_rt.hpp"
-  DEPENDS gensigrt
-)
-
 add_library(lpipp-include INTERFACE)
 add_library(lpipp::include ALIAS lpipp-include)
 target_include_directories(lpipp-include INTERFACE
