@@ -24,6 +24,11 @@
     {
       "name": "default",
       "configurePreset": "default"
+    },
+    {
+      "name": "test",
+      "configurePreset": "default",
+      "targets": "lpipp-tests"
     }
   ],
   "testPresets": [
