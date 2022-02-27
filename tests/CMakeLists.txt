@@ -16,19 +16,18 @@ add_library(lpipp-test-main STATIC EXCLUDE_FROM_ALL main.cpp)
 add_library(lpipp::test::main ALIAS lpipp-test-main)
 target_link_libraries(lpipp-test-main PUBLIC Catch2::Catch2)
 
-macro(construct_test name)
-    add_executable(${name} ${ARGN})
-    target_link_libraries(${name} PRIVATE lpipp::test::main)
-    target_compile_features(${name} PRIVATE cxx_std_20)
-    target_compile_options(${name} PRIVATE ${warnings})
-    catch_discover_tests(${name})
+macro(lpipp_add_test name)
+  add_executable(${name} ${ARGN})
+  target_link_libraries(${name} PRIVATE lpipp::test::main)
+  target_compile_features(${name} PRIVATE cxx_std_20)
+  target_compile_options(${name} PRIVATE ${warnings})
+  catch_discover_tests(${name})
 endmacro()
 
 add_subdirectory(mq)
 
-construct_test(lpipp-chrono-test)
-target_sources(lpipp-chrono-test PRIVATE chrono.test.cpp)
-target_link_libraries(lpipp-chrono-test PRIVATE lpipp::mq)
+lpipp_add_test(lpipp-chrono-test chrono.test.cpp)
+target_link_libraries(lpipp-chrono-test PRIVATE lpipp::include)
 
 add_test(NAME [[mq invalid mode combination]]
   COMMAND "${CMAKE_CTEST_COMMAND}"

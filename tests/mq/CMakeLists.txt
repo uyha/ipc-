@@ -1,7 +1,6 @@
 find_package(Threads REQUIRED)
 
-construct_test(lpipp-mq-test)
-target_sources(lpipp-mq-test PRIVATE
+lpipp_add_test(lpipp-mq-test
   attribute.test.cpp
   mode.test.cpp
   notify.test.cpp
