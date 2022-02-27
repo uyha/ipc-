@@ -16,13 +16,13 @@ add_library(lpipp-test-main STATIC EXCLUDE_FROM_ALL main.cpp)
 add_library(lpipp::test::main ALIAS lpipp-test-main)
 target_link_libraries(lpipp-test-main PUBLIC Catch2::Catch2)
 
-macro(lpipp_add_test name)
+function(lpipp_add_test name)
   add_executable(${name} ${ARGN})
   target_link_libraries(${name} PRIVATE lpipp::test::main)
   target_compile_features(${name} PRIVATE cxx_std_20)
   target_compile_options(${name} PRIVATE ${warnings})
   catch_discover_tests(${name})
-endmacro()
+endfunction()
 
 add_subdirectory(mq)
 
