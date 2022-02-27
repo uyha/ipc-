@@ -27,6 +27,6 @@ jobs:
           -DCMAKE_CXX_STANDARD=${{matrix.cpp_standard}}
           -DCMAKE_CXX_COMPILER=${{matrix.compiler.cxx}}
       - name: Build
-        run: cmake --build --preset test
+        run: cmake --build --preset test -j$(nproc)
       - name: Run tests
         run: ctest --preset default
