@@ -27,3 +27,8 @@ endfunction()
 lpipp_add_library(lpipp-mq mq.cpp)
 add_library(lpipp::mq ALIAS lpipp-mq)
 target_link_libraries(lpipp-mq PRIVATE rt)
+
+lpipp_add_library(lpipp-epoll epoll.cpp)
+add_library(lpipp::epoll ALIAS lpipp-epoll)
+target_link_libraries(lpipp-epoll PRIVATE rt)
+target_compile_options(lpipp-epoll PUBLIC -fconcepts)
