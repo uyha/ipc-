@@ -21,5 +21,5 @@ cases = [
 for case in cases:
     for permutation in permutations(case):
         print(
-            f"""REQUIRE(static_cast<int>({" | ".join(permutation)}) == ({" | ".join(map(modes.__getitem__, case))}));"""
+            f"""CHECK(static_cast<int>({" | ".join(permutation)}) == ({" | ".join(map(modes.__getitem__, case))}));"""
         )
