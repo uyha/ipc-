@@ -4,6 +4,12 @@
 using namespace lpipp;
 
 TEST_CASE("creating an epoll") {
-  auto epoll_instance = epoll::create();
-  REQUIRE(epoll_instance);
+  SECTION("without close_on_exec") {
+    auto epoll_instance = epoll::create();
+    REQUIRE(epoll_instance);
+  }
+  SECTION("with close_on_exec") {
+    auto epoll_instance = epoll::create(true);
+    REQUIRE(epoll_instance);
+  }
 }

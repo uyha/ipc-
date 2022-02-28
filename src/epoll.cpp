@@ -1,11 +1,12 @@
 #include <cerrno>
 #include <fcntl.h>
 #include <lpipp/epoll.hpp>
+#include <sys/epoll.h>
 #include <unistd.h>
 
 namespace lpipp {
 auto epoll::create(bool close_on_exec) noexcept -> tl::expected<epoll, CreateError> {
-  auto fd = ::epoll_create1(close_on_exec ? FD_CLOEXEC : 0);
+  auto fd = ::epoll_create1(close_on_exec ? EPOLL_CLOEXEC : 0);
   if (fd == -1) {
     return tl::unexpected{map_create_error(errno)};
   }
