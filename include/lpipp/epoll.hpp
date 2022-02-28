@@ -69,9 +69,9 @@ public:
     file_descriptor_existed,
     file_descriptor_same_with_epoll,
   };
-  template <concepts::is_any_of<CommonEvent, RequestEvent> Event,
-            concepts::is_any_of<void *, int, std::uint32_t, std::uint64_t> Data>
-  [[nodiscard]] auto add(int fd, Event events, Data data) const noexcept -> tl::expected<void, AddError>;
+  /* template <concepts::is_any_of<CommonEvent, RequestEvent> Event, */
+  /*           concepts::is_any_of<void *, int, std::uint32_t, std::uint64_t> Data> */
+  /* [[nodiscard]] auto add(int fd, Event events, Data data) const noexcept -> tl::expected<void, AddError>; */
 
   epoll(epoll const &) = delete;
   auto operator=(epoll const &) -> epoll & = delete;
