@@ -5,7 +5,7 @@ using namespace lpipp;
 using namespace mq_constants;
 
 TEST_CASE("getting attribute of a queue") {
-  auto name = "/queue";
+  auto name = "/queue.attribute.get";
   SECTION("blocking queue") {
     auto queue = mq::open(name, read_only | create, 0666);
     CHECK(queue);
@@ -22,7 +22,7 @@ TEST_CASE("getting attribute of a queue") {
 }
 
 TEST_CASE("setting/getting attribute of a queue") {
-  auto name = "/queue";
+  auto name = "/queue.attribute.get-set";
   SECTION("blocking queue") {
     auto queue = mq::open(name, read_only | create, 0666);
     CHECK(queue);
