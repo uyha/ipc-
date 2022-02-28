@@ -1,0 +1,42 @@
+#!/usr/bin/env python3
+
+from itertools import permutations
+
+modes = {
+    "in": "EPOLLIN",
+    "out": "EPOLLOUT",
+    "rdhup": "EPOLLRDHUP",
+    "pri": "EPOLLPRI",
+    "wakeup": "EPOLLWAKEUP",
+    "et": "EPOLLET",
+    "oneshot": "EPOLLONESHOT",
+    "exclusive": "EPOLLEXCLUSIVE",
+    "err": "EPOLLERR",
+    "hup": "EPOLLHUP",
+}
+
+case_sets = [
+    ["in", "rdhup", "wakeup", "oneshot"],
+    ["in", "wakeup", "exclusive"],
+    ["in", "rdhup", "err"],
+]
+
+print(
+    """#include <catch2/catch.hpp>
+#include <lpipp/epoll.hpp>
+
+using namespace lpipp;
+using namespace epoll_constants;
+
+TEST_CASE("epoll event bitor operations") {"""
+)
+
+for case_set in case_sets:
+    cases = (case_set[:i] for i in range(1, len(case_set) + 1))
+    for case in cases:
+        for permutation in permutations(case):
+            print(
+                f"""  CHECK(static_cast<std::uint32_t>({" | ".join(permutation)}) == static_cast<std::uint32_t>({" | ".join(map(modes.__getitem__, case))}));"""
+            )
+
+print("}")
