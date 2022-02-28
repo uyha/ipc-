@@ -33,52 +33,54 @@ add_subdirectory(epoll)
 lpipp_add_test(lpipp-chrono-test chrono.test.cpp)
 target_link_libraries(lpipp-chrono-test PRIVATE lpipp::include)
 
-add_test(NAME [[mq invalid mode combination]]
-  COMMAND "${CMAKE_CTEST_COMMAND}"
-          --build-and-test ${CMAKE_CURRENT_LIST_DIR}/compilation ${CMAKE_CURRENT_BINARY_DIR}/compilation
-          --build-generator ${CMAKE_GENERATOR}
-          --build-target mq-invalid-mode-combination
-          --build-options "-DCMAKE_MODULE_PATH=${CMAKE_BINARY_DIR}/src"
-                          "-DIPCPP_MQ=$<TARGET_FILE:lpipp::mq>"
-                          "-DIPCPP_MQ_INCLUDE=${CMAKE_SOURCE_DIR}/include"
+add_test(NAME [[configure compilation tests]]
+  COMMAND "${CMAKE_COMMAND}"
+            -B "${CMAKE_CURRENT_BINARY_DIR}/compilation"
+            -S "${CMAKE_CURRENT_SOURCE_DIR}/compilation"
+            -G "${CMAKE_GENERATOR}"
+            "-DCMAKE_MODULE_PATH=${CMAKE_BINARY_DIR}/src"
+            "-DIPCPP_MQ=$<TARGET_FILE:lpipp::mq>"
+            "-DIPCPP_MQ_INCLUDE=${CMAKE_SOURCE_DIR}/include"
 )
-set_tests_properties([[mq invalid mode combination]]
+set_tests_properties([[configure compilation tests]] PROPERTIES FIXTURE_SETUP compilation_tests)
+
+function(lpipp_add_compilation_test)
+  cmake_parse_arguments("" "" "NAME;TARGET" "PROPERTIES" ${ARGN})
+  add_test(NAME "${_NAME}"
+    COMMAND "${CMAKE_COMMAND}"
+              --build "${CMAKE_CURRENT_BINARY_DIR}/compilation"
+              --target "${_TARGET}"
+  )
+  set_tests_properties("${_NAME}"
+    PROPERTIES
+      FIXTURE_REQUIRED compilation_tests
+      DEPENDS [[configure compilation tests]]
+      ${_PROPERTIES}
+  )
+endfunction()
+
+
+lpipp_add_compilation_test(
+  NAME [[mq invalid mode combination]]
+  TARGET mq-invalid-mode-combination
   PROPERTIES
     PASS_REGULAR_EXPRESSION [[
 no match for ‘operator|’ (operand types are ‘const lpipp::mq::OpenMode’ and ‘const lpipp::mq::OpenMode’)
 ]]
 )
-
-add_test(NAME [[mq copy assignment disabled]]
-  COMMAND "${CMAKE_CTEST_COMMAND}"
-          --build-and-test ${CMAKE_CURRENT_LIST_DIR}/compilation ${CMAKE_CURRENT_BINARY_DIR}/compilation
-          --build-generator ${CMAKE_GENERATOR}
-          --build-target mq-copy-assignment-disabled
-          --build-options "-DCMAKE_MODULE_PATH=${CMAKE_BINARY_DIR}/src"
-                          "-DIPCPP_MQ=$<TARGET_FILE:lpipp::mq>"
-                          "-DIPCPP_MQ_INCLUDE=${CMAKE_SOURCE_DIR}/include"
-)
-set_tests_properties([[mq copy assignment disabled]]
+lpipp_add_compilation_test(
+  NAME [[mq copy assignment disabled]]
+  TARGET mq-copy-assignment-disabled
   PROPERTIES
     PASS_REGULAR_EXPRESSION [[
 use of deleted function ‘lpipp::mq::mq\(const lpipp::mq&\)’
 ]]
 )
-
-add_test(NAME [[mq copy constructor disabled]]
-  COMMAND "${CMAKE_CTEST_COMMAND}"
-          --build-and-test ${CMAKE_CURRENT_LIST_DIR}/compilation ${CMAKE_CURRENT_BINARY_DIR}/compilation
-          --build-generator ${CMAKE_GENERATOR}
-          --build-target mq-copy-constructor-disabled
-          --build-options "-DCMAKE_MODULE_PATH=${CMAKE_BINARY_DIR}/src"
-                          "-DIPCPP_MQ=$<TARGET_FILE:lpipp::mq>"
-                          "-DIPCPP_MQ_INCLUDE=${CMAKE_SOURCE_DIR}/include"
-)
-set_tests_properties([[mq copy constructor disabled]]
+lpipp_add_compilation_test(
+  NAME [[mq copy constructor disabled]]
+  TARGET "mq-copy-constructor-disabled"
   PROPERTIES
     PASS_REGULAR_EXPRESSION [[
 use of deleted function ‘lpipp::mq& lpipp::mq::operator=\(const lpipp::mq&\)’
 ]]
 )
-
-
