@@ -14,6 +14,14 @@ auto epoll::create(bool close_on_exec) noexcept -> tl::expected<epoll, CreateErr
   return epoll{fd};
 }
 
+auto epoll::remove(int fd) const noexcept -> tl::expected<void, RemoveError> {
+  auto result = ::epoll_ctl(m_fd, EPOLL_CTL_DEL, fd, nullptr);
+  if (result == -1){
+    return tl::unexpected{RemoveError::file_descriptor_not_registered};
+  }
+  return {};
+}
+
 epoll::epoll(epoll &&other) noexcept
     : m_fd{other.m_fd} {
   other.m_fd = -1;

@@ -98,6 +98,9 @@ public:
     return {};
   }
 
+  enum class RemoveError { file_descriptor_not_registered };
+  [[nodiscard]] auto remove(int fd) const noexcept -> tl::expected<void, RemoveError>;
+
   epoll(epoll const &) = delete;
   auto operator=(epoll const &) -> epoll & = delete;
 
