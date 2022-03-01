@@ -3,4 +3,4 @@ lpipp_add_test(lpipp-epoll-test
   create.test.cpp
   event.test.cpp
 )
-target_link_libraries(lpipp-epoll-test PRIVATE lpipp::epoll)
+target_link_libraries(lpipp-epoll-test PRIVATE lpipp::epoll lpipp::mq)

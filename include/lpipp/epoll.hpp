@@ -9,7 +9,7 @@
 #include <tl/expected.hpp>
 
 namespace lpipp {
-class epoll : fcntl<epoll> {
+class epoll : public fcntl<epoll> {
 public:
   enum class CreateError { too_many_process_files, too_many_system_files, memory_insufficient };
   [[nodiscard]] static auto create(bool close_on_exec = false) noexcept -> tl::expected<epoll, CreateError>;
@@ -68,10 +68,35 @@ public:
     file_descriptor_invalid,
     file_descriptor_existed,
     file_descriptor_same_with_epoll,
+    file_descriptor_not_supported,
+    loop_detected,
+    memory_insufficient,
+    max_watches_reached,
   };
-  /* template <concepts::is_any_of<CommonEvent, RequestEvent> Event, */
-  /*           concepts::is_any_of<void *, int, std::uint32_t, std::uint64_t> Data> */
-  /* [[nodiscard]] auto add(int fd, Event events, Data data) const noexcept -> tl::expected<void, AddError>; */
+  template <concepts::is_any_of<InOutEvent, SpecialEvent, RequestEvent, OneShotEvent, ExclusiveEvent> Event,
+            concepts::is_any_of<void *, int, std::uint32_t, std::uint64_t> Data>
+  [[nodiscard]] auto add(int fd, Event events, Data data) const noexcept -> tl::expected<void, AddError> {
+    if (m_fd == fd) {
+      return tl::unexpected{AddError::file_descriptor_same_with_epoll};
+    }
+    auto event_arg   = ::epoll_event{};
+    event_arg.events = static_cast<std::uint32_t>(events);
+    if constexpr (std::is_same_v<Data, void *>) {
+      event_arg.data.ptr = data;
+    } else if constexpr (std::is_same_v<Data, int>) {
+      event_arg.data.fd = data;
+    } else if constexpr (std::is_same_v<Data, std::uint32_t>) {
+      event_arg.data.u32 = data;
+    } else if constexpr (std::is_same_v<Data, std::uint64_t>) {
+      event_arg.data.u64 = data;
+    }
+
+    auto result = ::epoll_ctl(m_fd, EPOLL_CTL_ADD, fd, &event_arg);
+    if (result == -1) {
+      return tl::unexpected{map_add_error(errno)};
+    }
+    return {};
+  }
 
   epoll(epoll const &) = delete;
   auto operator=(epoll const &) -> epoll & = delete;
@@ -86,6 +111,8 @@ private:
 
   int m_fd;
 
+  friend fcntl<epoll>;
+
   [[nodiscard]] static constexpr auto map_create_error(int error) noexcept -> CreateError {
     switch (error) {
     case EMFILE: return CreateError::too_many_process_files;
@@ -98,6 +125,10 @@ private:
     switch (error) {
     case EBADF: return AddError::file_descriptor_invalid;
     case EEXIST: return AddError::file_descriptor_existed;
+    case EPERM: return AddError::file_descriptor_not_supported;
+    case ELOOP: return AddError::loop_detected;
+    case ENOMEM: return AddError::memory_insufficient;
+    case ENOSPC: return AddError::max_watches_reached;
     default: return static_cast<AddError>(error);
     }
   }
