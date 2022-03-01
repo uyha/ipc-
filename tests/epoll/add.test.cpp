@@ -7,7 +7,7 @@ using namespace epoll_constants;
 using namespace mq_constants;
 
 TEST_CASE("add to epoll") {
-  auto queue_name     = "/epoll.queue";
+  auto queue_name     = "/epoll.add";
   auto epoll_instance = epoll::create();
   auto queue          = mq::open(queue_name, read_only | create, 0666);
   REQUIRE(epoll_instance);
