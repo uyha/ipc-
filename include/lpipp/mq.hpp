@@ -141,6 +141,12 @@ public:
   ~mq() noexcept;
 
 private:
+  mq(int target_fd) noexcept;
+
+  int m_fd;
+
+  friend fcntl<mq>;
+
   [[nodiscard]] static constexpr auto valid_name(char const *name) noexcept -> bool {
     if (name[0] != '/') {
       return false;
@@ -243,12 +249,6 @@ private:
   [[nodiscard]] auto
   timed_receive(char *buffer, std::size_t len, ::timespec const *timeout, unsigned int *priority = nullptr) noexcept
       -> tl::expected<std::size_t, TimedReceiveError>;
-
-  mq(int target_fd) noexcept;
-
-  int m_fd;
-
-  friend fcntl<mq>;
 };
 namespace mq_constants {
 constexpr mq::OpenMode read_only      = mq::OpenMode::read_only;
