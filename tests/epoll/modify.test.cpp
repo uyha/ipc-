@@ -24,12 +24,15 @@ TEST_CASE("modify epoll") {
     REQUIRE_FALSE(modify_result);
     REQUIRE(modify_result.error() == epoll::ModifyError::exclusive_previously_specified);
   }
-  SECTION("modify exlusively registered fd should fail") {
-    auto add_result = epoll_instance->add(queue->get_handle(), in | exclusive, 0);
-    REQUIRE(add_result);
-    auto modify_result = epoll_instance->modify(queue->get_handle(), out, 0);
+  SECTION("modify invalid file descriptor should fail") {
+    auto modify_result = epoll_instance->modify(-1, in, 0);
     REQUIRE_FALSE(modify_result);
-    REQUIRE(modify_result.error() == epoll::ModifyError::exclusive_previously_specified);
+    REQUIRE(modify_result.error() == epoll::ModifyError::file_descriptor_invalid);
+  }
+  SECTION("modify file descriptor same as epoll should fail") {
+    auto modify_result = epoll_instance->modify(epoll_instance->get_handle(), in, 0);
+    REQUIRE_FALSE(modify_result);
+    REQUIRE(modify_result.error() == epoll::ModifyError::file_descriptor_same_with_epoll);
   }
   CHECK(mq::unlink(queue_name));
 }
