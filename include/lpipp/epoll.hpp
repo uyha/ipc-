@@ -9,6 +9,23 @@
 #include <tl/expected.hpp>
 
 namespace lpipp {
+
+template <typename T>
+concept EpollEventData = concepts::is_any_of<T, void *, int, std::uint32_t, std::uint64_t>;
+
+template <EpollEventData Data>
+constexpr auto set_epoll_event_data(::epoll_event &event, Data data) noexcept {
+  if constexpr (std::is_same_v<Data, void *>) {
+    event.data.ptr = data;
+  } else if constexpr (std::is_same_v<Data, int>) {
+    event.data.fd = data;
+  } else if constexpr (std::is_same_v<Data, std::uint32_t>) {
+    event.data.u32 = data;
+  } else if constexpr (std::is_same_v<Data, std::uint64_t>) {
+    event.data.u64 = data;
+  }
+}
+
 class epoll : public fcntl<epoll> {
 public:
   enum class CreateError { too_many_process_files, too_many_system_files, memory_insufficient };
@@ -74,27 +91,43 @@ public:
     memory_insufficient,
     max_watches_reached,
   };
+
   template <concepts::is_any_of<InOutEvent, SpecialEvent, RequestEvent, OneShotEvent, ExclusiveEvent> Event,
-            concepts::is_any_of<void *, int, std::uint32_t, std::uint64_t> Data>
+            EpollEventData Data>
   [[nodiscard]] auto add(int fd, Event events, Data data) const noexcept -> tl::expected<void, AddError> {
     if (m_fd == fd) {
       return tl::unexpected{AddError::file_descriptor_same_with_epoll};
     }
     auto event_arg   = ::epoll_event{};
     event_arg.events = static_cast<std::uint32_t>(events);
-    if constexpr (std::is_same_v<Data, void *>) {
-      event_arg.data.ptr = data;
-    } else if constexpr (std::is_same_v<Data, int>) {
-      event_arg.data.fd = data;
-    } else if constexpr (std::is_same_v<Data, std::uint32_t>) {
-      event_arg.data.u32 = data;
-    } else if constexpr (std::is_same_v<Data, std::uint64_t>) {
-      event_arg.data.u64 = data;
-    }
+    set_epoll_event_data(event_arg, data);
 
     auto result = ::epoll_ctl(m_fd, EPOLL_CTL_ADD, fd, &event_arg);
     if (result == -1) {
       return tl::unexpected{map_add_error(errno)};
+    }
+    return {};
+  }
+
+  enum class ModifyError {
+    file_descriptor_invalid,
+    file_descriptor_same_with_epoll,
+    exclusive_previously_specified,
+    file_descriptor_not_registered,
+    memory_insufficient,
+  };
+  template <concepts::is_any_of<InOutEvent, SpecialEvent, RequestEvent, OneShotEvent> Event, EpollEventData Data>
+  [[nodiscard]] auto modify(int fd, Event events, Data data) const noexcept -> tl::expected<void, ModifyError> {
+    if (m_fd == fd) {
+      return tl::unexpected{ModifyError::file_descriptor_same_with_epoll};
+    }
+    auto event_arg   = ::epoll_event{};
+    event_arg.events = static_cast<std::uint32_t>(events);
+    set_epoll_event_data(event_arg, data);
+
+    auto result = ::epoll_ctl(m_fd, EPOLL_CTL_MOD, fd, &event_arg);
+    if (result == -1) {
+      return tl::unexpected{map_modify_error(errno)};
     }
     return {};
   }
@@ -135,6 +168,15 @@ private:
     case ENOMEM: return AddError::memory_insufficient;
     case ENOSPC: return AddError::max_watches_reached;
     default: return static_cast<AddError>(error);
+    }
+  }
+  [[nodiscard]] static constexpr auto map_modify_error(int error) noexcept -> ModifyError {
+    switch (error) {
+    case EBADF: return ModifyError::file_descriptor_invalid;
+    case EINVAL: return ModifyError::exclusive_previously_specified;
+    case ENOENT: return ModifyError::file_descriptor_not_registered;
+    case ENOMEM: return ModifyError::memory_insufficient;
+    default: return static_cast<ModifyError>(error);
     }
   }
 };

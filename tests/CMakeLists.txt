@@ -39,8 +39,9 @@ add_test(NAME [[configure compilation tests]]
             -S "${CMAKE_CURRENT_SOURCE_DIR}/compilation"
             -G "${CMAKE_GENERATOR}"
             "-DCMAKE_MODULE_PATH=${CMAKE_BINARY_DIR}/src"
-            "-DIPCPP_MQ=$<TARGET_FILE:lpipp::mq>"
-            "-DIPCPP_MQ_INCLUDE=${CMAKE_SOURCE_DIR}/include"
+            "-DLPIPP_INCLUDE=${CMAKE_SOURCE_DIR}/include"
+            "-DLPIPP_MQ=$<TARGET_FILE:lpipp::mq>"
+            "-DLPIPP_EPOLL=$<TARGET_FILE:lpipp::epoll>"
 )
 set_tests_properties([[configure compilation tests]] PROPERTIES FIXTURE_SETUP compilation_tests)
 
@@ -64,23 +65,29 @@ lpipp_add_compilation_test(
   NAME [[mq invalid mode combination]]
   TARGET mq-invalid-mode-combination
   PROPERTIES
-    PASS_REGULAR_EXPRESSION [[
-no match for ‘operator|’ (operand types are ‘const lpipp::mq::OpenMode’ and ‘const lpipp::mq::OpenMode’)
-]]
+    PASS_REGULAR_EXPRESSION [[no match for ‘operator|’ \(.*OpenMode.*OpenMode.*\)]]
 )
 lpipp_add_compilation_test(
   NAME [[mq copy assignment disabled]]
   TARGET mq-copy-assignment-disabled
   PROPERTIES
-    PASS_REGULAR_EXPRESSION [[
-use of deleted function ‘lpipp::mq::mq\(const lpipp::mq&\)’
-]]
+    PASS_REGULAR_EXPRESSION [[use of deleted function ‘lpipp::mq::mq\(const lpipp::mq&\)’]]
 )
 lpipp_add_compilation_test(
   NAME [[mq copy constructor disabled]]
   TARGET "mq-copy-constructor-disabled"
   PROPERTIES
-    PASS_REGULAR_EXPRESSION [[
-use of deleted function ‘lpipp::mq& lpipp::mq::operator=\(const lpipp::mq&\)’
-]]
+    PASS_REGULAR_EXPRESSION [[use of deleted function ‘lpipp::mq& lpipp::mq::operator=\(const lpipp::mq&\)’]]
+)
+lpipp_add_compilation_test(
+  NAME [[epoll invalid exclusive combination]]
+  TARGET "epoll-invalid-exclusive-combination"
+  PROPERTIES
+    PASS_REGULAR_EXPRESSION [[no match for ‘operator|’ \(.*OneShot.*ExclusiveEvent.*\)]]
+)
+lpipp_add_compilation_test(
+  NAME [[epoll modify exclusive]]
+  TARGET "epoll-modify-exclusive"
+  PROPERTIES
+    PASS_REGULAR_EXPRESSION [[no matching function for call to ‘lpipp::epoll::modify\(.*ExclusiveEvent.*\)’]]
 )
