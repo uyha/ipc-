@@ -4,12 +4,11 @@
 
 using namespace lpipp;
 using namespace epoll_constants;
-using namespace mq_constants;
 
 TEST_CASE("add to epoll") {
   auto queue_name     = "/epoll.add";
   auto epoll_instance = epoll::create();
-  auto queue          = mq::open(queue_name, read_only | create, 0666);
+  auto queue          = mq::open(queue_name, mq_constants::read_only | mq_constants::create, 0666);
   REQUIRE(epoll_instance);
   SECTION("add an mq") {
     auto result = epoll_instance->add(queue->get_handle(), in, 0);
@@ -39,6 +38,13 @@ TEST_CASE("add to epoll") {
     REQUIRE_FALSE(result);
     CHECK(result.error() == epoll::AddError::file_descriptor_not_supported);
     CHECK(::close(dir) != -1);
+  }
+  SECTION("exclusive on epoll should fail") {
+    auto another_epoll = epoll::create();
+    REQUIRE(another_epoll);
+    auto result = epoll_instance->add(another_epoll->get_handle(), in | exclusive, 0);
+    REQUIRE_FALSE(result);
+    CHECK(result.error() == epoll::AddError::exclusive_on_epoll_error);
   }
   SECTION("loop induced") {
     auto another_epoll = epoll::create();

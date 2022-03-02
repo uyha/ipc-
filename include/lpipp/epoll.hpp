@@ -69,6 +69,7 @@ public:
     file_descriptor_existed,
     file_descriptor_same_with_epoll,
     file_descriptor_not_supported,
+    exclusive_on_epoll_error,
     loop_detected,
     memory_insufficient,
     max_watches_reached,
@@ -128,6 +129,7 @@ private:
     switch (error) {
     case EBADF: return AddError::file_descriptor_invalid;
     case EEXIST: return AddError::file_descriptor_existed;
+    case EINVAL: return AddError::exclusive_on_epoll_error;
     case EPERM: return AddError::file_descriptor_not_supported;
     case ELOOP: return AddError::loop_detected;
     case ENOMEM: return AddError::memory_insufficient;
