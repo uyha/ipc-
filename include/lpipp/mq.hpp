@@ -132,7 +132,7 @@ public:
   };
   [[nodiscard]] auto notify(int signal) noexcept -> tl::expected<void, SignalNotifyError>;
 
-  mq(mq const &) = delete;
+  mq(mq const &)                     = delete;
   auto operator=(mq const &) -> mq & = delete;
 
   mq(mq &&other) noexcept;
