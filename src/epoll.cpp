@@ -16,10 +16,24 @@ auto epoll::create(bool close_on_exec) noexcept -> tl::expected<epoll, CreateErr
 
 auto epoll::remove(int fd) const noexcept -> tl::expected<void, RemoveError> {
   auto result = ::epoll_ctl(m_fd, EPOLL_CTL_DEL, fd, nullptr);
-  if (result == -1){
+  if (result == -1) {
     return tl::unexpected{RemoveError::file_descriptor_not_registered};
   }
   return {};
+}
+
+auto epoll::wait(::epoll_event *event_list,
+                 int max_events,
+                 int timeout_millisecs,
+                 ::sigset_t const *sigmask) const noexcept -> tl::expected<int, WaitError> {
+  auto result = ::epoll_pwait(m_fd, event_list, max_events, timeout_millisecs, sigmask);
+  if (result == -1) {
+    return tl::unexpected{map_wait_error(errno)};
+  }
+  if (result == 0) {
+    return tl::unexpected{WaitError::timeout};
+  }
+  return result;
 }
 
 epoll::epoll(epoll &&other) noexcept

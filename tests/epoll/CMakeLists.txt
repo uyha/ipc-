@@ -4,5 +4,6 @@ lpipp_add_test(lpipp-epoll-test
   event.test.cpp
   modify.test.cpp
   remove.test.cpp
+  wait.test.cpp
 )
 target_link_libraries(lpipp-epoll-test PRIVATE lpipp::epoll lpipp::mq)

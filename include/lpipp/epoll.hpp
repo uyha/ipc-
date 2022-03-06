@@ -4,6 +4,9 @@
 #include "macros.hpp"
 
 #include <asm-generic/errno-base.h>
+#include <bits/types/sigset_t.h>
+#include <bits/types/struct_timespec.h>
+#include <chrono>
 #include <cstdint>
 #include <sys/epoll.h>
 #include <tl/expected.hpp>
@@ -135,7 +138,21 @@ public:
   enum class RemoveError { file_descriptor_not_registered };
   [[nodiscard]] auto remove(int fd) const noexcept -> tl::expected<void, RemoveError>;
 
-  epoll(epoll const &) = delete;
+  enum class WaitError { events_buffer_not_accessible, interrupted, max_events_invalid, timeout };
+  [[nodiscard]] auto wait(::epoll_event *event_list, int max_events, ::sigset_t const *sigmask = nullptr) const noexcept
+      -> tl::expected<int, WaitError> {
+    return wait(event_list, max_events, -1, sigmask);
+  }
+  template <typename DurationRep, typename DurationPeriod>
+  [[nodiscard]] auto wait(::epoll_event *event_list,
+                          int max_events,
+                          std::chrono::duration<DurationRep, DurationPeriod> wait_duration,
+                          ::sigset_t const *sigmask = nullptr) const noexcept -> tl::expected<int, WaitError> {
+    int timeout = std::chrono::duration_cast<std::chrono::milliseconds>(wait_duration).count();
+    return wait(event_list, max_events, timeout, sigmask);
+  }
+
+  epoll(epoll const &)                     = delete;
   auto operator=(epoll const &) -> epoll & = delete;
 
   epoll(epoll &&other) noexcept;
@@ -149,6 +166,11 @@ private:
   int m_fd;
 
   friend fcntl<epoll>;
+
+  [[nodiscard]] auto wait(::epoll_event *event_list,
+                          int max_events,
+                          int timeout_millisecs,
+                          ::sigset_t const *sigmask = nullptr) const noexcept -> tl::expected<int, WaitError>;
 
   [[nodiscard]] static constexpr auto map_create_error(int error) noexcept -> CreateError {
     switch (error) {
@@ -177,6 +199,14 @@ private:
     case ENOENT: return ModifyError::file_descriptor_not_registered;
     case ENOMEM: return ModifyError::memory_insufficient;
     default: return static_cast<ModifyError>(error);
+    }
+  }
+  [[nodiscard]] static constexpr auto map_wait_error(int error) noexcept -> WaitError {
+    switch (error) {
+    case EFAULT: return WaitError::events_buffer_not_accessible;
+    case EINTR: return WaitError::interrupted;
+    case EINVAL: return WaitError::max_events_invalid;
+    default: return static_cast<WaitError>(error);
     }
   }
 };
