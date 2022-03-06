@@ -23,7 +23,9 @@ function(lpipp_add_test name)
   target_link_libraries(${name} PRIVATE lpipp::test::main)
   target_compile_features(${name} PRIVATE cxx_std_20)
   target_compile_options(${name} PRIVATE ${warnings})
-  catch_discover_tests(${name})
+  catch_discover_tests(${name}
+    PROPERTIES TIMEOUT 1
+    )
   add_dependencies(lpipp-tests ${name})
 endfunction()
 
