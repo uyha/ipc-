@@ -5,8 +5,7 @@
     "minor": 21,
     "patch": 0
   },
-  "configurePresets": [
-    {
+  "configurePresets": [{
       "name": "default",
       "displayName": "Default Config",
       "description": "Default build using Ninja generator",
@@ -17,10 +16,12 @@
       },
       "environment": {}
     },
-    { "name": "dummy", "binaryDir": "${sourceDir}/build/tests" }
-  ],
-  "buildPresets": [
     {
+      "name": "dummy",
+      "binaryDir": "${sourceDir}/build/tests"
+    }
+  ],
+  "buildPresets": [{
       "name": "default",
       "configurePreset": "default"
     },
@@ -30,13 +31,11 @@
       "targets": "lpipp-tests"
     }
   ],
-  "testPresets": [
-    {
-      "name": "default",
-      "configurePreset": "dummy",
-      "output": {
-        "outputOnFailure": true
-      }
+  "testPresets": [{
+    "name": "default",
+    "configurePreset": "dummy",
+    "output": {
+      "outputOnFailure": true
     }
-  ]
+  }]
 }
