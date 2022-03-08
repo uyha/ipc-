@@ -18,7 +18,9 @@ public:
     read_write = O_RDWR,
   };
   enum class CreateMode : int {
-    create    = O_CREAT,
+    create = O_CREAT,
+  };
+  enum class ExclusiveMode : int {
     exclusive = O_EXCL,
   };
   enum class OpenCreateMode : int {};
@@ -28,14 +30,18 @@ public:
   };
 
   LPIPP_BITOR_OP(OpenMode, ExtraFlag, OpenMode)
+  LPIPP_BITOR_OP(OpenMode, ExclusiveMode, ExclusiveMode)
   LPIPP_BITOR_OP(OpenMode, CreateMode, OpenCreateMode)
 
   LPIPP_BITOR_OP(ExtraFlag, ExtraFlag)
+  LPIPP_BITOR_OP(ExtraFlag, ExclusiveMode, ExtraFlag)
 
   LPIPP_BITOR_OP(CreateMode, CreateMode)
+  LPIPP_BITOR_OP(CreateMode, ExclusiveMode, CreateMode)
   LPIPP_BITOR_OP(CreateMode, ExtraFlag, CreateMode)
 
   LPIPP_BITOR_OP(OpenCreateMode, CreateMode, OpenCreateMode)
+  LPIPP_BITOR_OP(OpenCreateMode, ExclusiveMode, OpenCreateMode)
   LPIPP_BITOR_OP(OpenCreateMode, ExtraFlag, OpenCreateMode)
 
   enum class OpenError {
@@ -67,14 +73,16 @@ public:
   [[nodiscard]] static auto open(char const *name, OpenMode mode) noexcept -> tl::expected<mq, OpenError>;
   [[nodiscard]] static auto open(char const *name, OpenCreateMode mode, std::filesystem::perms permissions) noexcept
       -> tl::expected<mq, OpenError>;
-  [[nodiscard]] static auto
-  open(char const *name, OpenCreateMode mode, std::filesystem::perms permissions, CreateAttributes attributes) noexcept
-      -> tl::expected<mq, OpenError>;
+  [[nodiscard]] static auto open(char const *name,
+                                 OpenCreateMode mode,
+                                 std::filesystem::perms permissions,
+                                 CreateAttributes attributes) noexcept -> tl::expected<mq, OpenError>;
   [[nodiscard]] static auto open(char const *name, OpenCreateMode mode, int permissions) noexcept
       -> tl::expected<mq, OpenError>;
-  [[nodiscard]] static auto
-  open(char const *name, OpenCreateMode mode, int permissions, CreateAttributes attributes) noexcept
-      -> tl::expected<mq, OpenError>;
+  [[nodiscard]] static auto open(char const *name,
+                                 OpenCreateMode mode,
+                                 int permissions,
+                                 CreateAttributes attributes) noexcept -> tl::expected<mq, OpenError>;
 
   enum class UnlinkError { permission_denied, name_too_long, queue_missing };
   [[nodiscard]] static auto unlink(char const *name) noexcept -> tl::expected<void, UnlinkError>;
@@ -117,11 +125,13 @@ public:
   [[nodiscard]] auto notify() noexcept -> tl::expected<void, NotifyError>;
   [[nodiscard]] auto notify(void (*callback)(::sigval), ::pthread_attr_t *new_thread_attributes = nullptr) noexcept
       -> tl::expected<void, NotifyError>;
-  [[nodiscard]] auto
-  notify(void (*callback)(::sigval), int value, ::pthread_attr_t *new_thread_attributes = nullptr) noexcept
+  [[nodiscard]] auto notify(void (*callback)(::sigval),
+                            int value,
+                            ::pthread_attr_t *new_thread_attributes = nullptr) noexcept
       -> tl::expected<void, NotifyError>;
-  [[nodiscard]] auto
-  notify(void (*callback)(::sigval), void *pointer, ::pthread_attr_t *new_thread_attributes = nullptr) noexcept
+  [[nodiscard]] auto notify(void (*callback)(::sigval),
+                            void *pointer,
+                            ::pthread_attr_t *new_thread_attributes = nullptr) noexcept
       -> tl::expected<void, NotifyError>;
   [[nodiscard]] auto notify(::sigevent *event) noexcept -> tl::expected<void, NotifyError>;
 
@@ -243,11 +253,14 @@ private:
 
   [[nodiscard]] auto set_attributes(long flags) noexcept -> ::mq_attr;
 
-  [[nodiscard]] auto
-  timed_send(char const *buffer, std::size_t len, ::timespec const *timeout, unsigned int priority) noexcept
-      -> tl::expected<void, TimedSendError>;
-  [[nodiscard]] auto
-  timed_receive(char *buffer, std::size_t len, ::timespec const *timeout, unsigned int *priority = nullptr) noexcept
+  [[nodiscard]] auto timed_send(char const *buffer,
+                                std::size_t len,
+                                ::timespec const *timeout,
+                                unsigned int priority) noexcept -> tl::expected<void, TimedSendError>;
+  [[nodiscard]] auto timed_receive(char *buffer,
+                                   std::size_t len,
+                                   ::timespec const *timeout,
+                                   unsigned int *priority = nullptr) noexcept
       -> tl::expected<std::size_t, TimedReceiveError>;
 };
 namespace mq_constants {
@@ -255,7 +268,7 @@ constexpr mq::OpenMode read_only      = mq::OpenMode::read_only;
 constexpr mq::OpenMode write_only     = mq::OpenMode::write_only;
 constexpr mq::OpenMode read_write     = mq::OpenMode::read_write;
 constexpr mq::CreateMode create       = mq::CreateMode::create;
-constexpr mq::CreateMode exclusive    = mq::CreateMode::exclusive;
+constexpr mq::ExclusiveMode exclusive = mq::ExclusiveMode::exclusive;
 constexpr mq::ExtraFlag close_on_exec = mq::ExtraFlag::close_on_exec;
 constexpr mq::ExtraFlag nonblock      = mq::ExtraFlag::nonblock;
 } // namespace mq_constants
