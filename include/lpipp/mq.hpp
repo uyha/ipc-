@@ -30,7 +30,7 @@ public:
   };
 
   LPIPP_BITOR_OP(OpenMode, ExtraFlag, OpenMode)
-  LPIPP_BITOR_OP(OpenMode, ExclusiveMode, ExclusiveMode)
+  LPIPP_BITOR_OP(OpenMode, ExclusiveMode, OpenMode)
   LPIPP_BITOR_OP(OpenMode, CreateMode, OpenCreateMode)
 
   LPIPP_BITOR_OP(ExtraFlag, ExtraFlag)
