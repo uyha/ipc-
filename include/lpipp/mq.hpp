@@ -49,9 +49,9 @@ public:
     name_invalid,
     queue_existed,
     attribute_invalid,
-    too_many_process_files,
+    file_descriptors_per_process_limit_reached,
     name_too_long,
-    too_many_system_files,
+    file_descriptors_system_wide_limit_reached,
     queue_missing,
     memory_insufficient,
     space_insufficient
@@ -177,9 +177,9 @@ private:
     case EACCES: return OpenError::permission_denied;
     case EEXIST: return OpenError::queue_existed;
     case EINVAL: return OpenError::attribute_invalid;
-    case EMFILE: return OpenError::too_many_process_files;
+    case EMFILE: return OpenError::file_descriptors_per_process_limit_reached;
     case ENAMETOOLONG: return OpenError::name_too_long;
-    case ENFILE: return OpenError::too_many_system_files;
+    case ENFILE: return OpenError::file_descriptors_system_wide_limit_reached;
     case ENOENT: return OpenError::queue_missing;
     case ENOMEM: return OpenError::memory_insufficient;
     case ENOSPC: return OpenError::space_insufficient;
