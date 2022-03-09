@@ -19,7 +19,7 @@ auto mq::open(const char *name, OpenMode mode) noexcept -> tl::expected<mq, Open
 }
 auto mq::open(const char *name, OpenCreateMode mode, std::filesystem::perms permissions) noexcept
     -> tl::expected<mq, OpenError> {
-  return mq::open(name, mode, static_cast<int>(permissions), nullptr);
+  return mq::open(name, mode, static_cast<::mode_t>(permissions), nullptr);
 }
 auto mq::open(const char *name,
               OpenCreateMode mode,
@@ -27,19 +27,19 @@ auto mq::open(const char *name,
               CreateAttributes attributes) noexcept -> tl::expected<mq, OpenError> {
   auto mq_attributes = attributes.mq_attr();
 
-  return mq::open(name, mode, static_cast<int>(permissions), &mq_attributes);
+  return mq::open(name, mode, static_cast<::mode_t>(permissions), &mq_attributes);
 }
-auto mq::open(const char *name, OpenCreateMode mode, int permissions) noexcept -> tl::expected<mq, OpenError> {
+auto mq::open(const char *name, OpenCreateMode mode, ::mode_t permissions) noexcept -> tl::expected<mq, OpenError> {
   return mq::open(name, mode, permissions, nullptr);
 }
-auto mq::open(const char *name, OpenCreateMode mode, int permissions, CreateAttributes attributes) noexcept
+auto mq::open(const char *name, OpenCreateMode mode, ::mode_t permissions, CreateAttributes attributes) noexcept
     -> tl::expected<mq, OpenError> {
   auto mq_attributes = attributes.mq_attr();
 
   return mq::open(name, mode, permissions, &mq_attributes);
 }
 
-auto mq::open(const char *name, OpenCreateMode mode, int permissions, ::mq_attr *attributes) noexcept
+auto mq::open(const char *name, OpenCreateMode mode, ::mode_t permissions, ::mq_attr *attributes) noexcept
     -> tl::expected<mq, OpenError> {
   using tl::unexpected, tl::expected;
 

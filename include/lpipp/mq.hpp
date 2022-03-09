@@ -77,11 +77,11 @@ public:
                                  OpenCreateMode mode,
                                  std::filesystem::perms permissions,
                                  CreateAttributes attributes) noexcept -> tl::expected<mq, OpenError>;
-  [[nodiscard]] static auto open(char const *name, OpenCreateMode mode, int permissions) noexcept
+  [[nodiscard]] static auto open(char const *name, OpenCreateMode mode, ::mode_t permissions) noexcept
       -> tl::expected<mq, OpenError>;
   [[nodiscard]] static auto open(char const *name,
                                  OpenCreateMode mode,
-                                 int permissions,
+                                 ::mode_t permissions,
                                  CreateAttributes attributes) noexcept -> tl::expected<mq, OpenError>;
 
   enum class UnlinkError { permission_denied, name_too_long, queue_missing };
@@ -248,8 +248,10 @@ private:
     }
   }
 
-  [[nodiscard]] static auto open(char const *name, OpenCreateMode mode, int permissions, ::mq_attr *attributes) noexcept
-      -> tl::expected<mq, OpenError>;
+  [[nodiscard]] static auto open(char const *name,
+                                 OpenCreateMode mode,
+                                 ::mode_t permissions,
+                                 ::mq_attr *attributes) noexcept -> tl::expected<mq, OpenError>;
 
   [[nodiscard]] auto set_attributes(long flags) noexcept -> ::mq_attr;
 
