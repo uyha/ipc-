@@ -45,6 +45,7 @@ add_test(NAME [[configure compilation tests]]
             "-DLPIPP_INCLUDE=${CMAKE_SOURCE_DIR}/include"
             "-DLPIPP_MQ=$<TARGET_FILE:lpipp::mq>"
             "-DLPIPP_EPOLL=$<TARGET_FILE:lpipp::epoll>"
+            "-DLPIPP_SHM=$<TARGET_FILE:lpipp::shm>"
 )
 set_tests_properties([[configure compilation tests]] PROPERTIES FIXTURE_SETUP compilation_tests)
 
@@ -86,11 +87,17 @@ lpipp_add_compilation_test(
   NAME [[epoll invalid exclusive combination]]
   TARGET "epoll-invalid-exclusive-combination"
   PROPERTIES
-    PASS_REGULAR_EXPRESSION [[no match for ‘operator|’ \(.*OneShot.*ExclusiveEvent.*\)]]
+    PASS_REGULAR_EXPRESSION [[error: no match for ‘operator\|’ \(.*OneShot.*ExclusiveEvent.*\)]]
 )
 lpipp_add_compilation_test(
   NAME [[epoll modify exclusive]]
   TARGET "epoll-modify-exclusive"
   PROPERTIES
     PASS_REGULAR_EXPRESSION [[no matching function for call to ‘lpipp::epoll::modify\(.*ExclusiveEvent.*\)’]]
+)
+lpipp_add_compilation_test(
+  NAME [[shm invalid mode combination]]
+  TARGET "shm-invalid-mode-combination"
+  PROPERTIES
+    PASS_REGULAR_EXPRESSION [[error: no match for ‘operator\|’ \(.*ReadOnlyMode.*TruncateMode.*\)]]
 )
