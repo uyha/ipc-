@@ -26,3 +26,7 @@ lpipp_add_library(lpipp-epoll epoll.cpp)
 add_library(lpipp::epoll ALIAS lpipp-epoll)
 target_link_libraries(lpipp-epoll PRIVATE rt)
 target_compile_options(lpipp-epoll PUBLIC ${LPIPP_CONCEPT})
+
+lpipp_add_library(lpipp-shm shm.cpp)
+add_library(lpipp::shm ALIAS lpipp-shm)
+target_link_libraries(lpipp-shm PRIVATE rt)

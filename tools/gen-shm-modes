@@ -1,0 +1,34 @@
+#!/usr/bin/env python3
+
+from itertools import permutations
+from gen_permutations import gen_permutations
+
+modes = {
+    "read_only": "O_RDONLY",
+    "read_write": "O_RDWR",
+    "create": "O_CREAT",
+    "exclusive": "O_EXCL",
+    "truncate": "O_TRUNC",
+}
+
+case_sets = [
+    ["read_only", "create", "exclusive"],
+    ["read_write", "create", "exclusive", "truncate"],
+]
+
+print(
+    """#include <catch2/catch.hpp>
+#include <lpipp/shm.hpp>
+
+using namespace lpipp;
+using namespace shm_constants;
+
+TEST_CASE("shared memeory open mode bitor operations") {"""
+)
+
+for permutation, case in gen_permutations(case_sets):
+    print(
+        f"""  CHECK(static_cast<std::uint32_t>({" | ".join(permutation)}) == static_cast<std::uint32_t>({" | ".join(map(modes.__getitem__, case))}));"""
+    )
+
+print("}")

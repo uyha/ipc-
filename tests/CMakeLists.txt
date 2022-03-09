@@ -31,6 +31,7 @@ endfunction()
 
 add_subdirectory(mq)
 add_subdirectory(epoll)
+add_subdirectory(shm)
 
 lpipp_add_test(lpipp-chrono-test chrono.test.cpp)
 target_link_libraries(lpipp-chrono-test PRIVATE lpipp::include)
