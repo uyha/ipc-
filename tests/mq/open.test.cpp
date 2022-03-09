@@ -54,7 +54,7 @@ TEST_CASE("opening a message queue") {
   }
 }
 
-TEST_CASE("opening with invalid name") {
+TEST_CASE("opening message queue with invalid name") {
   auto mode = read_only;
 
   auto empty_name = mq::open("", mode);
