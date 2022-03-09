@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from itertools import permutations
+from gen_permutations import gen_permutations
 
 modes = {
     "in": "EPOLLIN",
@@ -31,12 +32,9 @@ using namespace epoll_constants;
 TEST_CASE("epoll event bitor operations") {"""
 )
 
-for case_set in case_sets:
-    cases = (case_set[:i] for i in range(1, len(case_set) + 1))
-    for case in cases:
-        for permutation in permutations(case):
-            print(
-                f"""  CHECK(static_cast<std::uint32_t>({" | ".join(permutation)}) == static_cast<std::uint32_t>({" | ".join(map(modes.__getitem__, case))}));"""
-            )
+for permutation, case in gen_permutations(case_sets):
+    print(
+        f"""  CHECK(static_cast<std::uint32_t>({" | ".join(permutation)}) == static_cast<std::uint32_t>({" | ".join(map(modes.__getitem__, case))}));"""
+    )
 
 print("}")

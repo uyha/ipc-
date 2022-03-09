@@ -8,8 +8,9 @@ cmake-build-*/
 # Jetbrains
 .idea/**
 
-# Pipenv
+# Python
 Pipfile.lock
+**/__pycache__
 
 # Visual Studio
 .vs/**

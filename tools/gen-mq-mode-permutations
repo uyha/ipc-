@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from itertools import permutations
+from gen_permutations import gen_permutations
 
 modes = {
     "read_only": "O_RDONLY",
@@ -10,16 +11,23 @@ modes = {
     "nonblock": "O_NONBLOCK",
 }
 
-cases = [
-    ["read_only"],
-    ["read_only", "create"],
-    ["read_only", "create", "exclusive"],
-    ["read_only", "create", "exclusive", "close_on_exec"],
+case_sets = [
     ["read_only", "create", "exclusive", "close_on_exec", "nonblock"],
 ]
 
-for case in cases:
-    for permutation in permutations(case):
-        print(
-            f"""CHECK(static_cast<int>({" | ".join(permutation)}) == ({" | ".join(map(modes.__getitem__, case))}));"""
-        )
+print(
+    """#include <catch2/catch.hpp>
+#include <lpipp/mq.hpp>
+
+using namespace lpipp::mq_constants;
+
+TEST_CASE("open mode combinations") {
+"""
+)
+
+for permutation, case in gen_permutations(case_sets):
+    print(
+        f"""  CHECK(static_cast<int>({" | ".join(permutation)}) == ({" | ".join(map(modes.__getitem__, case))}));"""
+    )
+
+print("}")
