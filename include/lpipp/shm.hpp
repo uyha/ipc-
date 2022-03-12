@@ -62,6 +62,9 @@ public:
   enum class UnlinkError { permission_denied, shared_memory_missing };
   [[nodiscard]] static auto unlink(char const *name) noexcept -> tl::expected<void, UnlinkError>;
 
+  enum class TruncateError { unwritable };
+  [[nodiscard]] auto truncate(::off_t length) const noexcept -> tl::expected<void, TruncateError>;
+
   shm(shm const &)                     = delete;
   auto operator=(shm const &) -> shm & = delete;
 

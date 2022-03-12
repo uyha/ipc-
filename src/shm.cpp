@@ -43,6 +43,14 @@ auto shm::unlink(char const *name) noexcept -> tl::expected<void, UnlinkError> {
   }
 }
 
+auto shm::truncate(::off_t length) const noexcept -> tl::expected<void, TruncateError> {
+  if (auto result = ::ftruncate(m_fd, length); result == 0) {
+    return {};
+  } else {
+    return tl::unexpected{TruncateError::unwritable};
+  }
+}
+
 shm::shm(shm &&other) noexcept
     : m_fd{other.m_fd} {
   other.m_fd = -1;
