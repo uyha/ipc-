@@ -1,5 +1,4 @@
 #include <lpipp/shm.hpp>
-#include <sys/mman.h>
 #include <unistd.h>
 
 namespace lpipp {
@@ -49,6 +48,34 @@ auto shm::truncate(::off_t length) const noexcept -> tl::expected<void, Truncate
   } else {
     return tl::unexpected{TruncateError::unwritable};
   }
+}
+
+auto shm::map(std::size_t length, MapProtection protection, MapFlag map_flag, ::off_t offset) const noexcept
+    -> tl::expected<void *, MapError> {
+  return map(nullptr, length, protection, map_flag, offset);
+}
+auto shm::map(void *address,
+              std::size_t length,
+              MapProtection protection,
+              MapFlag map_flag,
+              ::off_t offset) const noexcept -> tl::expected<void *, MapError> {
+  auto const result = ::mmap(address, length, static_cast<int>(protection), static_cast<int>(map_flag), m_fd, offset);
+
+  if (result == MAP_FAILED) {
+    return tl::unexpected{map_map_error(errno)};
+  }
+
+  return result;
+}
+
+auto shm::unmap(void *address, std::size_t length) noexcept -> tl::expected<void, UnmapError> {
+  auto const result = ::munmap(address, length);
+
+  if (result == -1) {
+    return tl::unexpected{map_unmap_error(errno)};
+  }
+
+  return {};
 }
 
 shm::shm(shm &&other) noexcept
