@@ -5,48 +5,51 @@
 #include <asm-generic/errno-base.h>
 #include <cerrno>
 #include <fcntl.h>
+#include <system_error>
 #include <tl/expected.hpp>
+#include <type_traits>
 #include <unistd.h>
 
 namespace lpipp {
+namespace detail {
+struct fcntl {
+  enum class DupError : int { file_descriptors_per_process_limit_reached = EMFILE };
+  friend auto make_error_code(DupError error) noexcept -> std::error_code;
+
+  enum class DupAtLeastError : int {
+    invalid_minimum_file_descriptor_number     = EINVAL,
+    file_descriptors_per_process_limit_reached = EMFILE
+  };
+  friend auto make_error_code(DupAtLeastError error) noexcept -> std::error_code;
+
+  [[nodiscard]] static auto duplicate(int fd) noexcept -> tl::expected<int, std::error_code>;
+  [[nodiscard]] static auto duplicate_at_least(int fd, int minimum_fd) noexcept -> tl::expected<int, DupAtLeastError>;
+};
+} // namespace detail
+
 template <typename T>
 class fcntl {
 public:
   auto get_handle() const noexcept -> int {
     return static_cast<T const &>(*this).m_fd;
   }
+  [[nodiscard]] auto duplicate() const noexcept -> tl::expected<T, std::error_code> {
+    auto result = detail::fcntl::duplicate(get_handle());
+    if (not result) {
+      return tl::unexpected{result.error()};
+    }
 
-  enum class DupError : int { fd_limit_reached };
-  [[nodiscard]] auto duplicate() const noexcept -> tl::expected<T, DupError> {
-    auto new_fd = ::dup(get_handle());
-    if (new_fd == -1) {
-      return tl::unexpected{map_dup_error(errno)};
-    }
-    return T{new_fd};
+    return T{*result};
   }
-
-  enum class DupAtLeastError : int { fd_invalid, fd_limit_reached };
-  [[nodiscard]] auto duplicate_at_least(int minimum_fd) const noexcept -> tl::expected<T, DupAtLeastError> {
-    auto new_fd = ::fcntl(get_handle(), F_DUPFD, minimum_fd);
-    if (new_fd == -1) {
-      return tl::unexpected{map_dup_at_least_error(errno)};
+  [[nodiscard]] auto duplicate_at_least(int minimum_fd) const noexcept -> tl::expected<T, std::error_code> {
+    auto result = detail::fcntl::duplicate_at_least(get_handle(), minimum_fd);
+    if (not result) {
+      return tl::unexpected{result.error()};
     }
-    return T{new_fd};
-  }
-
-private:
-  [[nodiscard]] static constexpr auto map_dup_error(int error) noexcept -> DupError {
-    switch (error) {
-    case EMFILE: return DupError::fd_limit_reached;
-    default: return static_cast<DupError>(error);
-    }
-  }
-  [[nodiscard]] static constexpr auto map_dup_at_least_error(int error) noexcept -> DupAtLeastError {
-    switch (error) {
-    case EINVAL: return DupAtLeastError::fd_invalid;
-    case EMFILE: return DupAtLeastError::fd_limit_reached;
-    default: return static_cast<DupAtLeastError>(error);
-    }
+    return T{*result};
   }
 };
 } // namespace lpipp
+
+LPIPP_IS_ERROR_CODE(lpipp::detail::fcntl::DupError)
+LPIPP_IS_ERROR_CODE(lpipp::detail::fcntl::DupAtLeastError)
