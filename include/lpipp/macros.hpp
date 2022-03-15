@@ -23,13 +23,12 @@
 
 #define LPIPP_BITAND_OP_IMPL(left_type, right_type)                                                                    \
   friend constexpr auto operator&(left_type lhs, right_type rhs) noexcept->bool {                                      \
-    return static_cast<std::underlying_type_t<left_type>>(lhs)                                                         \
-           & static_cast<std::underlying_type_t<right_type>>(rhs);                                                    \
+    return static_cast<std::underlying_type_t<left_type>>(lhs) & static_cast<std::underlying_type_t<right_type>>(rhs); \
   }
 
 #define LPIPP_SAME_TYPE_BITAND_OP(input_type) LPIPP_BITAND_OP_IMPL(input_type, input_type)
 #define LPIPP_DIFF_TYPE_BITAND_OP(left_type, right_type)                                                               \
-  LPIPP_BITAND_OP_IMPL(left_type, right_type)                                                                           \
+  LPIPP_BITAND_OP_IMPL(left_type, right_type)                                                                          \
                                                                                                                        \
   friend constexpr auto operator&(right_type lhs, left_type rhs) noexcept->bool {                                      \
     return rhs & lhs;                                                                                                  \
@@ -37,3 +36,12 @@
 
 #define LPIPP_BITAND_OP(...)                                                                                           \
   LPIPP_BITAND_OVERRIDE(__VA_ARGS__, LPIPP_DIFF_TYPE_BITAND_OP, LPIPP_SAME_TYPE_BITAND_OP, dummy)(__VA_ARGS__)
+
+#define LPIPP_IS_ERROR_CODE(error_enum)                                                                                \
+  template <>                                                                                                          \
+  struct std::is_error_code_enum<error_enum> : std::true_type {};
+
+#define LPIPP_MAKE_ERROR_CODE(error_enum, error_category)                                                              \
+  auto make_error_code(error_enum error) noexcept->std::error_code {                                                   \
+    return {static_cast<int>(error), error_category};                                                                  \
+  }
