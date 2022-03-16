@@ -12,7 +12,8 @@ struct FcntlDuplicateErrorCategory : std::error_category {
     default: return "Unknown error";
     }
   }
-};
+} const fcntl_duplicate_error_category{};
+
 struct FcntlDuplicateAtLeastErrorCategory : std::error_category {
   auto name() const noexcept -> char const * {
     return "mq::DupAtLeastError";
@@ -26,9 +27,7 @@ struct FcntlDuplicateAtLeastErrorCategory : std::error_category {
     default: return "Unknown error";
     }
   }
-};
-FcntlDuplicateErrorCategory const fcntl_duplicate_error_category{};
-FcntlDuplicateAtLeastErrorCategory const fcntl_duplicate_at_least_error_category{};
+} const fcntl_duplicate_at_least_error_category{};
 } // namespace
 
 namespace lpipp::detail {

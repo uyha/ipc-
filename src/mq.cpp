@@ -30,7 +30,7 @@ struct MqOpenErrorCategory : std::error_category {
     default: return "Unknown error";
     }
   }
-};
+} const mq_open_error_category{};
 
 struct MqUnlinkErrorCategory : std::error_category {
   auto name() const noexcept -> char const * {
@@ -45,7 +45,7 @@ struct MqUnlinkErrorCategory : std::error_category {
     default: return "Unknown error";
     }
   }
-};
+} const mq_unlink_error_category{};
 
 struct MqSendErrorCategory : std::error_category {
   auto name() const noexcept -> char const * {
@@ -61,7 +61,7 @@ struct MqSendErrorCategory : std::error_category {
     default: return "Unknown error";
     }
   }
-};
+} const mq_send_error_category{};
 
 struct MqReceiveErrorCategory : std::error_category {
   auto name() const noexcept -> char const * {
@@ -77,7 +77,7 @@ struct MqReceiveErrorCategory : std::error_category {
     default: return "Unknown error";
     }
   }
-};
+} const mq_receive_error_category{};
 
 struct MqTimedSendErrorCategory : std::error_category {
   auto name() const noexcept -> char const * {
@@ -95,7 +95,7 @@ struct MqTimedSendErrorCategory : std::error_category {
     default: return "Unknown error";
     }
   }
-};
+} const mq_timed_send_error_category{};
 
 struct MqTimedReceiveErrorCategory : std::error_category {
   auto name() const noexcept -> char const * {
@@ -113,7 +113,7 @@ struct MqTimedReceiveErrorCategory : std::error_category {
     default: return "Unknown error";
     }
   }
-};
+} const mq_timed_receive_error_category{};
 
 struct MqNotifyErrorCategory : std::error_category {
   auto name() const noexcept -> char const * {
@@ -127,7 +127,7 @@ struct MqNotifyErrorCategory : std::error_category {
     default: return "Unknown error";
     }
   }
-};
+} const mq_notify_error_category{};
 
 struct MqSignalNotifyErrorCategory : std::error_category {
   auto name() const noexcept -> char const * {
@@ -142,16 +142,7 @@ struct MqSignalNotifyErrorCategory : std::error_category {
     default: return "Unknown error";
     }
   }
-};
-
-MqOpenErrorCategory const mq_open_error_category{};
-MqUnlinkErrorCategory const mq_unlink_error_category{};
-MqSendErrorCategory const mq_send_error_category{};
-MqReceiveErrorCategory const mq_receive_error_category{};
-MqTimedSendErrorCategory const mq_timed_send_error_category{};
-MqTimedReceiveErrorCategory const mq_timed_receive_error_category{};
-MqNotifyErrorCategory const mq_notify_error_category{};
-MqSignalNotifyErrorCategory const mq_signal_notify_error_category{};
+} const mq_signal_notify_error_category{};
 } // namespace
 
 namespace lpipp {
