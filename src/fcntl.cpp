@@ -32,8 +32,8 @@ FcntlDuplicateAtLeastErrorCategory const fcntl_duplicate_at_least_error_category
 } // namespace
 
 namespace lpipp::detail {
-LPIPP_MAKE_ERROR_CODE(fcntl::DupError, fcntl_duplicate_error_category)
-LPIPP_MAKE_ERROR_CODE(fcntl::DupAtLeastError, fcntl_duplicate_at_least_error_category)
+LPIPP_DEFINE_MAKE_ERROR_CODE(fcntl::DupError, fcntl_duplicate_error_category)
+LPIPP_DEFINE_MAKE_ERROR_CODE(fcntl::DupAtLeastError, fcntl_duplicate_at_least_error_category)
 
 auto fcntl::duplicate(int fd) noexcept -> tl::expected<int, std::error_code> {
   auto new_fd = ::dup(fd);

@@ -26,27 +26,19 @@ public:
     space_insufficient                         = ENOSPC,
     name_invalid,
   };
-  friend auto make_error_code(OpenError error) noexcept -> std::error_code;
-
   enum class UnlinkError { permission_denied = EACCES, name_too_long = ENAMETOOLONG, queue_missing = ENOENT };
-  friend auto make_error_code(UnlinkError error) noexcept -> std::error_code;
-
   enum class SendError : int {
     queue_full      = EAGAIN,
     queue_read_only = EBADF,
     interrupted     = EINTR,
     message_too_big = EMSGSIZE,
   };
-  friend auto make_error_code(SendError error) noexcept -> std::error_code;
-
   enum class ReceiveError : int {
     queue_empty      = EAGAIN,
     queue_write_only = EBADF,
     interrupted      = EINTR,
     buffer_too_small = EMSGSIZE,
   };
-  friend auto make_error_code(ReceiveError error) noexcept -> std::error_code;
-
   enum class TimedSendError : int {
     queue_full      = EAGAIN,
     queue_read_only = EBADF,
@@ -55,8 +47,6 @@ public:
     message_too_big = EMSGSIZE,
     timedout        = ETIMEDOUT
   };
-  friend auto make_error_code(TimedSendError error) noexcept -> std::error_code;
-
   enum class TimedReceiveError : int {
     queue_empty      = EAGAIN,
     queue_write_only = EBADF,
@@ -65,17 +55,21 @@ public:
     buffer_too_small = EMSGSIZE,
     timedout         = ETIMEDOUT
   };
-  friend auto make_error_code(TimedReceiveError error) noexcept -> std::error_code;
-
   enum class NotifyError : int { registration_existed = EBUSY, memory_insufficient = ENOMEM };
-  friend auto make_error_code(NotifyError error) noexcept -> std::error_code;
-
   enum class SignalNotifyError : int {
     registration_existed = EBUSY,
     signal_invalid       = EINVAL,
     memory_insufficient  = ENOMEM,
   };
-  friend auto make_error_code(SignalNotifyError error) noexcept -> std::error_code;
+
+  friend LPIPP_DECLARE_MAKE_ERROR_CODE(OpenError);
+  friend LPIPP_DECLARE_MAKE_ERROR_CODE(UnlinkError);
+  friend LPIPP_DECLARE_MAKE_ERROR_CODE(SendError);
+  friend LPIPP_DECLARE_MAKE_ERROR_CODE(ReceiveError);
+  friend LPIPP_DECLARE_MAKE_ERROR_CODE(TimedSendError);
+  friend LPIPP_DECLARE_MAKE_ERROR_CODE(TimedReceiveError);
+  friend LPIPP_DECLARE_MAKE_ERROR_CODE(NotifyError);
+  friend LPIPP_DECLARE_MAKE_ERROR_CODE(SignalNotifyError);
 
   enum class OpenMode : int {
     read_only  = O_RDONLY,

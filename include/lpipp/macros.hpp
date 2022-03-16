@@ -41,7 +41,9 @@
   template <>                                                                                                          \
   struct std::is_error_code_enum<error_enum> : std::true_type {};
 
-#define LPIPP_MAKE_ERROR_CODE(error_enum, error_category)                                                              \
+#define LPIPP_DECLARE_MAKE_ERROR_CODE(error_enum) auto make_error_code(error_enum error) noexcept->std::error_code
+
+#define LPIPP_DEFINE_MAKE_ERROR_CODE(error_enum, error_category)                                                       \
   auto make_error_code(error_enum error) noexcept->std::error_code {                                                   \
     return {static_cast<int>(error), error_category};                                                                  \
   }

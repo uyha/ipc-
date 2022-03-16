@@ -14,13 +14,13 @@ namespace lpipp {
 namespace detail {
 struct fcntl {
   enum class DupError : int { file_descriptors_per_process_limit_reached = EMFILE };
-  friend auto make_error_code(DupError error) noexcept -> std::error_code;
-
   enum class DupAtLeastError : int {
     invalid_minimum_file_descriptor_number     = EINVAL,
     file_descriptors_per_process_limit_reached = EMFILE
   };
-  friend auto make_error_code(DupAtLeastError error) noexcept -> std::error_code;
+
+  friend LPIPP_DECLARE_MAKE_ERROR_CODE(DupError);
+  friend LPIPP_DECLARE_MAKE_ERROR_CODE(DupAtLeastError);
 
   [[nodiscard]] static auto duplicate(int fd) noexcept -> tl::expected<int, std::error_code>;
   [[nodiscard]] static auto duplicate_at_least(int fd, int minimum_fd) noexcept -> tl::expected<int, DupAtLeastError>;

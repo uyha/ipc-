@@ -155,14 +155,14 @@ MqSignalNotifyErrorCategory const mq_signal_notify_error_category{};
 } // namespace
 
 namespace lpipp {
-LPIPP_MAKE_ERROR_CODE(mq::OpenError, mq_open_error_category)
-LPIPP_MAKE_ERROR_CODE(mq::UnlinkError, mq_unlink_error_category)
-LPIPP_MAKE_ERROR_CODE(mq::SendError, mq_send_error_category)
-LPIPP_MAKE_ERROR_CODE(mq::ReceiveError, mq_receive_error_category)
-LPIPP_MAKE_ERROR_CODE(mq::TimedSendError, mq_timed_send_error_category)
-LPIPP_MAKE_ERROR_CODE(mq::TimedReceiveError, mq_timed_receive_error_category)
-LPIPP_MAKE_ERROR_CODE(mq::NotifyError, mq_notify_error_category)
-LPIPP_MAKE_ERROR_CODE(mq::SignalNotifyError, mq_signal_notify_error_category)
+LPIPP_DEFINE_MAKE_ERROR_CODE(mq::OpenError, mq_open_error_category)
+LPIPP_DEFINE_MAKE_ERROR_CODE(mq::UnlinkError, mq_unlink_error_category)
+LPIPP_DEFINE_MAKE_ERROR_CODE(mq::SendError, mq_send_error_category)
+LPIPP_DEFINE_MAKE_ERROR_CODE(mq::ReceiveError, mq_receive_error_category)
+LPIPP_DEFINE_MAKE_ERROR_CODE(mq::TimedSendError, mq_timed_send_error_category)
+LPIPP_DEFINE_MAKE_ERROR_CODE(mq::TimedReceiveError, mq_timed_receive_error_category)
+LPIPP_DEFINE_MAKE_ERROR_CODE(mq::NotifyError, mq_notify_error_category)
+LPIPP_DEFINE_MAKE_ERROR_CODE(mq::SignalNotifyError, mq_signal_notify_error_category)
 
 auto mq::open(const char *name, OpenMode mode) noexcept -> tl::expected<mq, std::error_code> {
   using tl::unexpected;
