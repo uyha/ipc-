@@ -12,7 +12,7 @@ TEST_CASE("remove from epoll") {
   SECTION("remove registered instance") {
     auto second_epoll = epoll::create();
     REQUIRE(second_epoll);
-    REQUIRE(epoll_instance->add(second_epoll->get_handle(), in, 0));
+    REQUIRE(epoll_instance->add(second_epoll->get_handle(), In, 0));
     REQUIRE(epoll_instance->remove(second_epoll->get_handle()));
   }
   SECTION("remove unregistered epoll") {

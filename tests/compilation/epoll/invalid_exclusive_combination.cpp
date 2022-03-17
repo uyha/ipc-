@@ -2,5 +2,5 @@
 
 int main(){
   using namespace lpipp::epoll_constants;
-  (void)(oneshot | exclusive);
+  (void)(Oneshot | Exclusive);
 }

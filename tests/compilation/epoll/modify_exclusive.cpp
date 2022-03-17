@@ -5,5 +5,5 @@ int main() {
   using namespace epoll_constants;
 
   auto epoll = epoll::create();
-  (void)epoll->modify(0, exclusive, 0);
+  (void)epoll->modify(0, Exclusive, 0);
 }

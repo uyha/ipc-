@@ -21,7 +21,7 @@ TEST_CASE("wait on epoll") {
   auto receive_buffer = std::array<char, 1>{};
   REQUIRE(epoll_instance);
   REQUIRE(queue);
-  REQUIRE(epoll_instance->add(queue->get_handle(), in, queue->get_handle()));
+  REQUIRE(epoll_instance->add(queue->get_handle(), In, queue->get_handle()));
   REQUIRE(queue->get_attributes().mq_curmsgs == 0);
   SECTION("wait and receive") {
     auto send_result = queue->send(queue_name, 1);

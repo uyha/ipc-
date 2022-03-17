@@ -162,16 +162,16 @@ private:
                           ::sigset_t const *sigmask = nullptr) const noexcept -> tl::expected<int, std::error_code>;
 };
 namespace epoll_constants {
-constexpr epoll::InOutEvent in            = epoll::InOutEvent::in;
-constexpr epoll::InOutEvent out           = epoll::InOutEvent::out;
-constexpr epoll::SpecialEvent rdhup       = epoll::SpecialEvent::rdhup;
-constexpr epoll::SpecialEvent pri         = epoll::SpecialEvent::pri;
-constexpr epoll::RequestEvent wakeup      = epoll::RequestEvent::wakeup;
-constexpr epoll::RequestEvent et          = epoll::RequestEvent::et;
-constexpr epoll::OneShotEvent oneshot     = epoll::OneShotEvent::oneshot;
-constexpr epoll::ExclusiveEvent exclusive = epoll::ExclusiveEvent::exclusive;
-constexpr epoll::ResponseEvent err        = epoll::ResponseEvent::err;
-constexpr epoll::ResponseEvent hup        = epoll::ResponseEvent::hup;
+constexpr epoll::InOutEvent In            = epoll::InOutEvent::in;
+constexpr epoll::InOutEvent Out           = epoll::InOutEvent::out;
+constexpr epoll::SpecialEvent Rdhup       = epoll::SpecialEvent::rdhup;
+constexpr epoll::SpecialEvent Pri         = epoll::SpecialEvent::pri;
+constexpr epoll::RequestEvent Wakeup      = epoll::RequestEvent::wakeup;
+constexpr epoll::RequestEvent Et          = epoll::RequestEvent::et;
+constexpr epoll::OneShotEvent Oneshot     = epoll::OneShotEvent::oneshot;
+constexpr epoll::ExclusiveEvent Exclusive = epoll::ExclusiveEvent::exclusive;
+constexpr epoll::ResponseEvent Err        = epoll::ResponseEvent::err;
+constexpr epoll::ResponseEvent Hup        = epoll::ResponseEvent::hup;
 } // namespace epoll_constants
 } // namespace lpipp
 

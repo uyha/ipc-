@@ -4,22 +4,22 @@ from itertools import permutations
 from gen_permutations import gen_permutations
 
 modes = {
-    "in": "EPOLLIN",
-    "out": "EPOLLOUT",
-    "rdhup": "EPOLLRDHUP",
-    "pri": "EPOLLPRI",
-    "wakeup": "EPOLLWAKEUP",
-    "et": "EPOLLET",
-    "oneshot": "EPOLLONESHOT",
-    "exclusive": "EPOLLEXCLUSIVE",
-    "err": "EPOLLERR",
-    "hup": "EPOLLHUP",
+    "In": "EPOLLIN",
+    "Out": "EPOLLOUT",
+    "Rdhup": "EPOLLRDHUP",
+    "Pri": "EPOLLPRI",
+    "Wakeup": "EPOLLWAKEUP",
+    "Et": "EPOLLET",
+    "Oneshot": "EPOLLONESHOT",
+    "Exclusive": "EPOLLEXCLUSIVE",
+    "Err": "EPOLLERR",
+    "Hup": "EPOLLHUP",
 }
 
 case_sets = [
-    ["in", "rdhup", "wakeup", "oneshot"],
-    ["in", "wakeup", "exclusive"],
-    ["in", "rdhup", "err"],
+    ["In", "Rdhup", "Wakeup", "Oneshot"],
+    ["In", "Wakeup", "Exclusive"],
+    ["In", "Rdhup", "Err"],
 ]
 
 print(
