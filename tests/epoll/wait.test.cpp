@@ -14,7 +14,7 @@ TEST_CASE("wait on epoll") {
   (void)mq::unlink(queue_name);
   auto epoll_instance = epoll::create();
   auto queue          = mq::open(queue_name,
-                        mq_constants::read_write | mq_constants::create,
+                        mq_constants::ReadWrite | mq_constants::Create,
                         0666,
                         {.max_messages = 1, .max_message_size = 1});
   auto buffer         = std::array<::epoll_event, 1>{};

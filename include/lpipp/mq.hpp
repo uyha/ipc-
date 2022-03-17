@@ -225,13 +225,13 @@ private:
       -> tl::expected<std::size_t, std::error_code>;
 };
 namespace mq_constants {
-constexpr mq::OpenMode read_only      = mq::OpenMode::read_only;
-constexpr mq::OpenMode write_only     = mq::OpenMode::write_only;
-constexpr mq::OpenMode read_write     = mq::OpenMode::read_write;
-constexpr mq::CreateMode create       = mq::CreateMode::create;
-constexpr mq::ExclusiveMode exclusive = mq::ExclusiveMode::exclusive;
-constexpr mq::ExtraFlag close_on_exec = mq::ExtraFlag::close_on_exec;
-constexpr mq::ExtraFlag nonblock      = mq::ExtraFlag::nonblock;
+constexpr mq::OpenMode ReadOnly      = mq::OpenMode::read_only;
+constexpr mq::OpenMode WriteOnly     = mq::OpenMode::write_only;
+constexpr mq::OpenMode ReadWrite     = mq::OpenMode::read_write;
+constexpr mq::CreateMode Create       = mq::CreateMode::create;
+constexpr mq::ExclusiveMode Exclusive = mq::ExclusiveMode::exclusive;
+constexpr mq::ExtraFlag CloseOnExec = mq::ExtraFlag::close_on_exec;
+constexpr mq::ExtraFlag Nonblock      = mq::ExtraFlag::nonblock;
 } // namespace mq_constants
 } // namespace lpipp
 

@@ -7,7 +7,7 @@ using namespace mq_constants;
 TEST_CASE("sending and reading attributes") {
   SECTION("blocking then nonblocking") {
     auto name  = "/send";
-    auto queue = mq::open(name, create | write_only, 0666, {.max_messages = 1, .max_message_size = 8});
+    auto queue = mq::open(name, Create | WriteOnly, 0666, {.max_messages = 1, .max_message_size = 8});
     REQUIRE(queue);
     CHECK(queue->send(name, 0));
     {
@@ -24,7 +24,7 @@ TEST_CASE("sending and reading attributes") {
   }
   SECTION("nonblocking") {
     auto name  = "/send";
-    auto queue = mq::open(name, create | write_only | nonblock, 0666, {.max_messages = 1, .max_message_size = 8});
+    auto queue = mq::open(name, Create | WriteOnly | Nonblock, 0666, {.max_messages = 1, .max_message_size = 8});
     REQUIRE(queue);
     CHECK(queue->send(name, 0));
     {
@@ -43,7 +43,7 @@ TEST_CASE("sending and reading attributes") {
 }
 TEST_CASE("reading empty nonblocking queue") {
   auto name  = "/receive";
-  auto queue = mq::open(name, create | read_only | nonblock, 0666, {.max_messages = 1, .max_message_size = 1});
+  auto queue = mq::open(name, Create | ReadOnly | Nonblock, 0666, {.max_messages = 1, .max_message_size = 1});
   REQUIRE(queue);
   auto result = queue->receive(nullptr, 1);
   CHECK_FALSE(result);
@@ -54,7 +54,7 @@ TEST_CASE("reading empty nonblocking queue") {
 TEST_CASE("sending and reading from the same queue") {
   auto name     = "/send-receive";
   auto buffer   = std::array<char, 1>{'\0'};
-  auto queue    = mq::open(name, create | read_write, 0666, {.max_messages = 2, .max_message_size = 1});
+  auto queue    = mq::open(name, Create | ReadWrite, 0666, {.max_messages = 2, .max_message_size = 1});
   auto priority = 1000u;
   REQUIRE(queue);
   SECTION("send then receive") {
@@ -93,7 +93,7 @@ TEST_CASE("sending and reading from the same queue") {
 TEST_CASE("sending/receiving from read/write only queues") {
   SECTION("send to readonly queue") {
     auto name  = "/mq.send-readonly-queue";
-    auto queue = mq::open(name, create | read_only, 0666);
+    auto queue = mq::open(name, Create | ReadOnly, 0666);
     REQUIRE(queue);
     auto result = queue->send(name, 1);
     CHECK_FALSE(result);
@@ -102,7 +102,7 @@ TEST_CASE("sending/receiving from read/write only queues") {
   }
   SECTION("read from writeonly queue") {
     auto name  = "/mq.read-writeonly-queue";
-    auto queue = mq::open(name, create | write_only, 0666);
+    auto queue = mq::open(name, Create | WriteOnly, 0666);
     REQUIRE(queue);
     auto result = queue->receive(nullptr, 1);
     CHECK_FALSE(result);
@@ -114,7 +114,7 @@ TEST_CASE("duplicate then send and receive") {
   SECTION("send from original and receive from duplicated") {
     auto name           = "/mq.dup.send-receive";
     auto buffer         = std::array<char, 5>{};
-    auto original_queue = mq::open(name, create | read_write, 0666, {.max_messages = 1, .max_message_size = 1});
+    auto original_queue = mq::open(name, Create | ReadWrite, 0666, {.max_messages = 1, .max_message_size = 1});
     REQUIRE(original_queue);
     auto dup_queue = original_queue->duplicate();
     REQUIRE(dup_queue);
@@ -128,7 +128,7 @@ TEST_CASE("duplicate then send and receive") {
   SECTION("send from original and receive from duplicated and check file descriptor") {
     auto name           = "/mq.dup-at-least.send-receive";
     auto buffer         = std::array<char, 5>{};
-    auto original_queue = mq::open(name, create | read_write, 0666, {.max_messages = 1, .max_message_size = 1});
+    auto original_queue = mq::open(name, Create | ReadWrite, 0666, {.max_messages = 1, .max_message_size = 1});
     REQUIRE(original_queue);
     auto dup_queue = original_queue->duplicate_at_least(10);
     REQUIRE(dup_queue);

@@ -8,7 +8,7 @@ using namespace mq_constants;
 TEST_CASE("move construction") {
   auto name = "/mq.move-construction";
   SECTION("interacting with moved from object will give bad file descriptor error") {
-    auto move_queue = mq::open(name, create | write_only | nonblock, 0666);
+    auto move_queue = mq::open(name, Create | WriteOnly | Nonblock, 0666);
     REQUIRE(move_queue);
     auto queue  = std::move(*move_queue);
     auto result = move_queue->send(name, 1);
@@ -18,7 +18,7 @@ TEST_CASE("move construction") {
     CHECK(mq::unlink(name));
   }
   SECTION("move constructed queue behaves normally") {
-    auto move_queue = mq::open(name, create | write_only | nonblock, 0666);
+    auto move_queue = mq::open(name, Create | WriteOnly | Nonblock, 0666);
     REQUIRE(move_queue);
     REQUIRE(move_queue);
     auto queue  = std::move(*move_queue);

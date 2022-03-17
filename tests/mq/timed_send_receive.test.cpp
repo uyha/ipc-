@@ -11,7 +11,7 @@ using namespace std::chrono_literals;
 
 TEST_CASE("timed sending nonblocking message queue") {
   auto name  = "/mq.timed-send-nonblock";
-  auto queue = mq::open(name, write_only | create | nonblock, 0666, {.max_messages = 1, .max_message_size = 1});
+  auto queue = mq::open(name, WriteOnly | Create | Nonblock, 0666, {.max_messages = 1, .max_message_size = 1});
   REQUIRE(queue);
   {
     auto result = queue->send(name, 1, 2s);
@@ -28,7 +28,7 @@ TEST_CASE("timed sending nonblocking message queue") {
 
 TEST_CASE("timed sending blocking message queue") {
   auto name  = "/mq.timed-send-block";
-  auto queue = mq::open(name, write_only | create, 0666, {.max_messages = 1, .max_message_size = 1});
+  auto queue = mq::open(name, WriteOnly | Create, 0666, {.max_messages = 1, .max_message_size = 1});
   REQUIRE(queue);
   {
     auto result = queue->send(name, 1, 2s);
@@ -53,7 +53,7 @@ TEST_CASE("timed sending blocking message queue") {
 
 TEST_CASE("timed receiving nonblocking message queue") {
   auto name   = "/mq.timed-receive-nonblock";
-  auto queue  = mq::open(name, read_only | create | nonblock, 0666, {.max_messages = 1, .max_message_size = 1});
+  auto queue  = mq::open(name, ReadOnly | Create | Nonblock, 0666, {.max_messages = 1, .max_message_size = 1});
   auto result = queue->receive(nullptr, 1, 2s);
   CHECK_FALSE(result);
   CHECK(result.error() == mq::TimedReceiveError::queue_empty);
@@ -62,7 +62,7 @@ TEST_CASE("timed receiving nonblocking message queue") {
 
 TEST_CASE("timed receiving blocking message queue") {
   auto name  = "/mq.timed-receive-block";
-  auto queue = mq::open(name, read_only | create, 0666, {.max_messages = 1, .max_message_size = 1});
+  auto queue = mq::open(name, ReadOnly | Create, 0666, {.max_messages = 1, .max_message_size = 1});
   REQUIRE(queue);
   {
     auto result = queue->receive(nullptr, 1, 0.1s);
@@ -87,7 +87,7 @@ TEST_CASE("timed receiving blocking message queue") {
 
 TEST_CASE("timed sending and receiving") {
   auto name   = "/mq.timed-sending-receiving-block";
-  auto queue  = mq::open(name, create | read_write, 0666, {.max_messages = 1, .max_message_size = 1});
+  auto queue  = mq::open(name, Create | ReadWrite, 0666, {.max_messages = 1, .max_message_size = 1});
   auto buffer = std::array<char, 1>{};
   REQUIRE(queue);
   {

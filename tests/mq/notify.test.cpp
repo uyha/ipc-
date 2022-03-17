@@ -26,7 +26,7 @@ TEST_CASE("register notification of a message queue") {
 
   SECTION("register then unregister") {
     auto name  = NAME;
-    auto queue = mq::open(name, create | read_write, 0666, {.max_messages = 1, .max_message_size = 1});
+    auto queue = mq::open(name, Create | ReadWrite, 0666, {.max_messages = 1, .max_message_size = 1});
     REQUIRE(queue);
     CHECK(queue->notify());
     CHECK(queue->unnotify());
@@ -35,7 +35,7 @@ TEST_CASE("register notification of a message queue") {
 
   SECTION("register twice should create an error") {
     auto name  = NAME;
-    auto queue = mq::open(name, create | read_write, 0666, {.max_messages = 1, .max_message_size = 1});
+    auto queue = mq::open(name, Create | ReadWrite, 0666, {.max_messages = 1, .max_message_size = 1});
     REQUIRE(queue);
     auto pid = ::fork();
     if (pid == 0) {
@@ -51,7 +51,7 @@ TEST_CASE("register notification of a message queue") {
 
   SECTION("register with thread callback") {
     auto name  = NAME;
-    auto queue = mq::open(name, create | read_write, 0666, {.max_messages = 1, .max_message_size = 1});
+    auto queue = mq::open(name, Create | ReadWrite, 0666, {.max_messages = 1, .max_message_size = 1});
     auto const attributes = queue->get_attributes();
     REQUIRE(attributes.mq_curmsgs == 0);
     REQUIRE(queue->notify([](::sigval) { mq_thread_callback_called = true; }));
@@ -62,7 +62,7 @@ TEST_CASE("register notification of a message queue") {
   }
   SECTION("register with thread callback and having value in it") {
     auto name  = NAME;
-    auto queue = mq::open(name, create | read_write, 0666, {.max_messages = 1, .max_message_size = 1});
+    auto queue = mq::open(name, Create | ReadWrite, 0666, {.max_messages = 1, .max_message_size = 1});
     auto const attributes = queue->get_attributes();
     REQUIRE(attributes.mq_curmsgs == 0);
     REQUIRE(queue->notify([](::sigval val) { mq_thread_callback_int = val.sival_int; }, 1));
@@ -73,7 +73,7 @@ TEST_CASE("register notification of a message queue") {
   }
   SECTION("register with thread callback and having pointer in it") {
     auto name  = NAME;
-    auto queue = mq::open(name, create | read_write, 0666, {.max_messages = 1, .max_message_size = 1});
+    auto queue = mq::open(name, Create | ReadWrite, 0666, {.max_messages = 1, .max_message_size = 1});
     auto const attributes = queue->get_attributes();
     REQUIRE(attributes.mq_curmsgs == 0);
     REQUIRE(queue->notify([](::sigval val) { mq_thread_callback_pointer = val.sival_ptr; }, (void *)0xFF));
@@ -84,7 +84,7 @@ TEST_CASE("register notification of a message queue") {
   }
   SECTION("register with invalid signal should fail") {
     auto name  = NAME;
-    auto queue = mq::open(name, create | read_write, 0666, {.max_messages = 1, .max_message_size = 1});
+    auto queue = mq::open(name, Create | ReadWrite, 0666, {.max_messages = 1, .max_message_size = 1});
     auto result = queue->notify(-1);
     REQUIRE_FALSE(result);
     REQUIRE(result.error() == mq::SignalNotifyError::signal_invalid);
@@ -92,7 +92,7 @@ TEST_CASE("register notification of a message queue") {
   }
   SECTION("register and wait for signal to come") {
     auto name  = NAME;
-    auto queue = mq::open(name, create | read_write, 0666, {.max_messages = 1, .max_message_size = 1});
+    auto queue = mq::open(name, Create | ReadWrite, 0666, {.max_messages = 1, .max_message_size = 1});
     std::signal(SIGUSR1, [](int) { mq_signal_callback_called = true; });
     REQUIRE(queue->notify(SIGUSR1));
     REQUIRE(queue->send(name, 1));

@@ -4,15 +4,15 @@ from itertools import permutations
 from gen_permutations import gen_permutations
 
 modes = {
-    "read_only": "O_RDONLY",
-    "create": "O_CREAT",
-    "exclusive": "O_EXCL",
-    "close_on_exec": "O_CLOEXEC",
-    "nonblock": "O_NONBLOCK",
+    "ReadOnly": "O_RDONLY",
+    "Create": "O_CREAT",
+    "Exclusive": "O_EXCL",
+    "CloseOnExec": "O_CLOEXEC",
+    "Nonblock": "O_NONBLOCK",
 }
 
 case_sets = [
-    ["read_only", "create", "exclusive", "close_on_exec", "nonblock"],
+    ["ReadOnly", "Create", "Exclusive", "CloseOnExec", "Nonblock"],
 ]
 
 print(

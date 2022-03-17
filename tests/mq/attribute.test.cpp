@@ -7,13 +7,13 @@ using namespace mq_constants;
 TEST_CASE("getting attribute of a queue") {
   auto name = "/queue.attribute.get";
   SECTION("blocking queue") {
-    auto queue = mq::open(name, read_only | create, 0666);
+    auto queue = mq::open(name, ReadOnly | Create, 0666);
     CHECK(queue);
     auto attributes = queue->get_attributes();
     CHECK_FALSE(attributes.mq_flags & O_NONBLOCK);
   }
   SECTION("getting attribute of a nonblocking queue") {
-    auto queue = mq::open(name, read_only | create | nonblock, 0666);
+    auto queue = mq::open(name, ReadOnly | Create | Nonblock, 0666);
     CHECK(queue);
     auto attributes = queue->get_attributes();
     CHECK(attributes.mq_flags & O_NONBLOCK);
@@ -24,7 +24,7 @@ TEST_CASE("getting attribute of a queue") {
 TEST_CASE("setting/getting attribute of a queue") {
   auto name = "/queue.attribute.get-set";
   SECTION("blocking queue") {
-    auto queue = mq::open(name, read_only | create, 0666);
+    auto queue = mq::open(name, ReadOnly | Create, 0666);
     CHECK(queue);
 
     auto attributes = queue->get_attributes();
@@ -40,7 +40,7 @@ TEST_CASE("setting/getting attribute of a queue") {
     CHECK(new_attributes.mq_flags & O_NONBLOCK);
   }
   SECTION("nonblocking queue") {
-    auto queue = mq::open(name, read_only | create | nonblock, 0666);
+    auto queue = mq::open(name, ReadOnly | Create | Nonblock, 0666);
     CHECK(queue);
 
     auto attributes = queue->get_attributes();
