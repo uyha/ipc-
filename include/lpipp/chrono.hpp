@@ -16,4 +16,9 @@ constexpr auto to_timespec(std::chrono::time_point<std::chrono::system_clock, Du
 
   return {.tv_sec = sec, .tv_nsec = nsec};
 }
+constexpr auto to_timepoint(::timespec value) noexcept -> std::chrono::system_clock::time_point {
+  using namespace std::chrono;
+  auto const duration = seconds{value.tv_sec} + nanoseconds{value.tv_nsec};
+  return system_clock::time_point{duration_cast<system_clock::duration>(duration)};
+}
 } // namespace lpipp
