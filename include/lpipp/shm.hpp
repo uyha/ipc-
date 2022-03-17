@@ -14,6 +14,34 @@
 namespace lpipp {
 class shm {
 public:
+  enum class OpenError {
+    permission_denied                          = EACCES,
+    shared_memory_existed                      = EEXIST,
+    name_invalid                               = EINVAL,
+    file_descriptors_per_process_limit_reached = EMFILE,
+    name_too_long                              = ENAMETOOLONG,
+    file_descriptors_system_wide_limit_reached = ENFILE,
+    shared_memory_missing                      = ENOENT,
+  };
+  enum class UnlinkError { permission_denied = EACCES, shared_memory_missing = ENOENT };
+  enum class TruncateError { unwritable = EINVAL };
+  enum class MapError {
+    access_invalid                       = EACCES,
+    file_or_memory_locked                = EAGAIN,
+    argument_invalid                     = EINVAL,
+    system_wide_open_files_limit_reached = ENFILE,
+    memory_insufficient                  = ENOMEM,
+    overflown                            = EOVERFLOW,
+    permission_denied                    = EPERM,
+  };
+  enum class UnmapError { argument_invalid = EINVAL, memory_insufficient = ENOMEM };
+
+  friend LPIPP_DECLARE_MAKE_ERROR_CODE(OpenError);
+  friend LPIPP_DECLARE_MAKE_ERROR_CODE(UnlinkError);
+  friend LPIPP_DECLARE_MAKE_ERROR_CODE(TruncateError);
+  friend LPIPP_DECLARE_MAKE_ERROR_CODE(MapError);
+  friend LPIPP_DECLARE_MAKE_ERROR_CODE(UnmapError);
+
   enum class ReadOnlyMode : int { read_only = O_RDONLY };
   enum class ReadWriteMode : int { read_write = O_RDWR };
   enum class CreateMode : int { create = O_CREAT };
@@ -43,32 +71,21 @@ public:
 
   LPIPP_BITOR_OP(TruncateMode, ReadWriteCreateMode, ReadWriteCreateMode)
 
-  enum class OpenError {
-    permission_denied,
-    shared_memory_existed,
-    name_invalid,
-    file_descriptors_per_process_limit_reached,
-    name_too_long,
-    file_descriptors_system_wide_limit_reached,
-    shared_memory_missing,
-  };
-  [[nodiscard]] static auto open(char const *name, ReadOnlyMode mode) noexcept -> tl::expected<shm, OpenError>;
-  [[nodiscard]] static auto open(char const *name, ReadWriteMode mode) noexcept -> tl::expected<shm, OpenError>;
+  [[nodiscard]] static auto open(char const *name, ReadOnlyMode mode) noexcept -> tl::expected<shm, std::error_code>;
+  [[nodiscard]] static auto open(char const *name, ReadWriteMode mode) noexcept -> tl::expected<shm, std::error_code>;
   [[nodiscard]] static auto open(char const *name, ReadCreateMode mode, std::filesystem::perms permissions) noexcept
-      -> tl::expected<shm, OpenError>;
+      -> tl::expected<shm, std::error_code>;
   [[nodiscard]] static auto open(char const *name, ReadCreateMode mode, ::mode_t permissions) noexcept
-      -> tl::expected<shm, OpenError>;
+      -> tl::expected<shm, std::error_code>;
   [[nodiscard]] static auto open(char const *name,
                                  ReadWriteCreateMode mode,
-                                 std::filesystem::perms permissions) noexcept -> tl::expected<shm, OpenError>;
+                                 std::filesystem::perms permissions) noexcept -> tl::expected<shm, std::error_code>;
   [[nodiscard]] static auto open(char const *name, ReadWriteCreateMode mode, ::mode_t permissions) noexcept
-      -> tl::expected<shm, OpenError>;
+      -> tl::expected<shm, std::error_code>;
 
-  enum class UnlinkError { permission_denied, shared_memory_missing };
-  [[nodiscard]] static auto unlink(char const *name) noexcept -> tl::expected<void, UnlinkError>;
+  [[nodiscard]] static auto unlink(char const *name) noexcept -> tl::expected<void, std::error_code>;
 
-  enum class TruncateError { unwritable };
-  [[nodiscard]] auto truncate(::off_t length) const noexcept -> tl::expected<void, TruncateError>;
+  [[nodiscard]] auto truncate(::off_t length) const noexcept -> tl::expected<void, std::error_code>;
 
   enum class MapProtection { exec, read, write };
   enum class MapFlag { shared = MAP_SHARED, shared_validate = MAP_SHARED_VALIDATE, map_private = MAP_PRIVATE };
@@ -93,27 +110,17 @@ public:
 
   LPIPP_BITOR_OP(MapFlag, MapExtraFlag, MapFlag)
 
-  enum class MapError {
-    access_invalid,
-    file_or_memory_locked,
-    argument_invalid,
-    system_wide_open_files_limit_reached,
-    memory_insufficient,
-    overflown,
-    permission_denied,
-  };
   [[nodiscard]] auto map(std::size_t length,
                          MapProtection protection,
                          MapFlag map_flag,
-                         ::off_t offset = 0) const noexcept -> tl::expected<void *, MapError>;
+                         ::off_t offset = 0) const noexcept -> tl::expected<void *, std::error_code>;
   [[nodiscard]] auto map(void *address,
                          std::size_t length,
                          MapProtection protection,
                          MapFlag map_flag,
-                         ::off_t offset = 0) const noexcept -> tl::expected<void *, MapError>;
+                         ::off_t offset = 0) const noexcept -> tl::expected<void *, std::error_code>;
 
-  enum class UnmapError { argument_invalid, memory_insufficient };
-  [[nodiscard]] static auto unmap(void *address, std::size_t length) noexcept -> tl::expected<void, UnmapError>;
+  [[nodiscard]] static auto unmap(void *address, std::size_t length) noexcept -> tl::expected<void, std::error_code>;
 
   shm(shm const &)                     = delete;
   auto operator=(shm const &) -> shm & = delete;
@@ -124,46 +131,8 @@ public:
   ~shm() noexcept;
 
 private:
-  [[nodiscard]] static constexpr auto map_open_error(int error) noexcept -> OpenError {
-    switch (error) {
-    case EACCES: return OpenError::permission_denied;
-    case EEXIST: return OpenError::shared_memory_existed;
-    case EINVAL: return OpenError::name_invalid;
-    case EMFILE: return OpenError::file_descriptors_per_process_limit_reached;
-    case ENAMETOOLONG: return OpenError::name_too_long;
-    case ENFILE: return OpenError::file_descriptors_system_wide_limit_reached;
-    case ENOENT: return OpenError::shared_memory_missing;
-    default: return static_cast<OpenError>(error);
-    }
-  }
-  [[nodiscard]] static constexpr auto map_unlink_error(int error) noexcept -> UnlinkError {
-    switch (error) {
-    case EACCES: return UnlinkError::permission_denied;
-    case ENOENT: return UnlinkError::shared_memory_missing;
-    default: return static_cast<UnlinkError>(error);
-    }
-  }
-  [[nodiscard]] static constexpr auto map_map_error(int error) noexcept -> MapError {
-    switch (error) {
-    case EACCES: return MapError::access_invalid;
-    case EAGAIN: return MapError::file_or_memory_locked;
-    case EINVAL: return MapError::argument_invalid;
-    case ENFILE: return MapError::system_wide_open_files_limit_reached;
-    case ENOMEM: return MapError::memory_insufficient;
-    case EOVERFLOW: return MapError::overflown;
-    case EPERM: return MapError::permission_denied;
-    default: return static_cast<MapError>(error);
-    }
-  }
-  [[nodiscard]] static constexpr auto map_unmap_error(int error) noexcept -> UnmapError {
-    switch (error) {
-    case EINVAL: return UnmapError::argument_invalid;
-    case ENOMEM: return UnmapError::memory_insufficient;
-    default: return static_cast<UnmapError>(error);
-    }
-  }
-
-  [[nodiscard]] static auto open(char const *name, int flags, ::mode_t mode) noexcept -> tl::expected<shm, OpenError>;
+  [[nodiscard]] static auto open(char const *name, int flags, ::mode_t mode) noexcept
+      -> tl::expected<shm, std::error_code>;
 
   shm(int fd) noexcept;
 
@@ -199,3 +168,9 @@ constexpr shm::MapExtraFlag uninitialized = shm::MapExtraFlag::uninitialized;
 #endif
 } // namespace shm_constants
 } // namespace lpipp
+
+LPIPP_IS_ERROR_CODE(lpipp::shm::OpenError)
+LPIPP_IS_ERROR_CODE(lpipp::shm::UnlinkError)
+LPIPP_IS_ERROR_CODE(lpipp::shm::TruncateError)
+LPIPP_IS_ERROR_CODE(lpipp::shm::MapError)
+LPIPP_IS_ERROR_CODE(lpipp::shm::UnmapError)
