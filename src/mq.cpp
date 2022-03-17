@@ -54,7 +54,7 @@ struct MqSendErrorCategory : std::error_category {
   auto message(int error) const -> std::string {
     switch (static_cast<lpipp::mq::SendError>(error)) {
     case lpipp::mq::SendError::queue_full: return "The queue was full and nonblock attribute is specified";
-    case lpipp::mq::SendError::queue_read_only: return "The queue is not opened for sending";
+    case lpipp::mq::SendError::queue_read_only: return "The queue is not open for sending";
     case lpipp::mq::SendError::interrupted: return "Sending to queue was interrupted by a signal handler";
     case lpipp::mq::SendError::message_too_big:
       return "msg_len was greater than the mq_msgsize attribute of the message queue";
@@ -70,7 +70,7 @@ struct MqReceiveErrorCategory : std::error_category {
   auto message(int error) const -> std::string {
     switch (static_cast<lpipp::mq::ReceiveError>(error)) {
     case lpipp::mq::ReceiveError::queue_empty: return "The queue was empty and nonblock attribute is specified";
-    case lpipp::mq::ReceiveError::queue_write_only: return "The queue is not opened for receiving";
+    case lpipp::mq::ReceiveError::queue_write_only: return "The queue is not open for receiving";
     case lpipp::mq::ReceiveError::interrupted: return "Receiving from queue was interrupted by a signal handler";
     case lpipp::mq::ReceiveError::buffer_too_small:
       return "msg_len was less than the mq_msgsize attribute of the message queue";
@@ -86,7 +86,7 @@ struct MqTimedSendErrorCategory : std::error_category {
   auto message(int error) const -> std::string {
     switch (static_cast<lpipp::mq::TimedSendError>(error)) {
     case lpipp::mq::TimedSendError::queue_full: return "The queue was full and nonblock attribute is specified";
-    case lpipp::mq::TimedSendError::queue_read_only: return "The queue is not opened for sending";
+    case lpipp::mq::TimedSendError::queue_read_only: return "The queue is not open for sending";
     case lpipp::mq::TimedSendError::interrupted: return "Sending to queue was interrupted by a signal handler";
     case lpipp::mq::TimedSendError::timeout_invalid: return "Invalid timeout";
     case lpipp::mq::TimedSendError::message_too_big:
@@ -104,7 +104,7 @@ struct MqTimedReceiveErrorCategory : std::error_category {
   auto message(int error) const -> std::string {
     switch (static_cast<lpipp::mq::TimedReceiveError>(error)) {
     case lpipp::mq::TimedReceiveError::queue_empty: return "The queue was empty and nonblock attribute is specified";
-    case lpipp::mq::TimedReceiveError::queue_write_only: return "The queue is not opened for receiving";
+    case lpipp::mq::TimedReceiveError::queue_write_only: return "The queue is not open for receiving";
     case lpipp::mq::TimedReceiveError::interrupted: return "Receiving from queue was interrupted by a signal handler";
     case lpipp::mq::TimedReceiveError::timeout_invalid: return "Invalid timeout";
     case lpipp::mq::TimedReceiveError::buffer_too_small:
