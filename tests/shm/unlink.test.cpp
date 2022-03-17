@@ -12,7 +12,7 @@ TEST_CASE("unlinking shared memory") {
   }
   SECTION("creating and unlinking queue") {
     auto name          = "/shm.unlink.open";
-    auto shared_memory = shm::open(name, read_only | create, 0666);
+    auto shared_memory = shm::open(name, ReadOnly | Create, 0666);
     auto result        = shm::unlink(name);
     CHECK(result);
   }
@@ -20,7 +20,7 @@ TEST_CASE("unlinking shared memory") {
     auto name   = "/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
                   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
                   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
-    auto queue  = shm::open(name, read_only | create, 0666);
+    auto queue  = shm::open(name, ReadOnly | Create, 0666);
     auto result = shm::unlink(name);
     CHECK_FALSE(result);
     CHECK(result.error() == shm::UnlinkError::shared_memory_missing);

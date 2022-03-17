@@ -4,16 +4,16 @@ from itertools import permutations
 from gen_permutations import gen_permutations
 
 modes = {
-    "read_only": "O_RDONLY",
-    "read_write": "O_RDWR",
-    "create": "O_CREAT",
-    "exclusive": "O_EXCL",
-    "truncate": "O_TRUNC",
+    "ReadOnly": "O_RDONLY",
+    "ReadWrite": "O_RDWR",
+    "Create": "O_CREAT",
+    "Exclusive": "O_EXCL",
+    "Truncate": "O_TRUNC",
 }
 
 case_sets = [
-    ["read_only", "create", "exclusive"],
-    ["read_write", "create", "exclusive", "truncate"],
+    ["ReadOnly", "Create", "Exclusive"],
+    ["ReadWrite", "Create", "Exclusive", "Truncate"],
 ]
 
 print(

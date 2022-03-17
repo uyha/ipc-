@@ -11,22 +11,22 @@ using namespace shm_constants;
 TEST_CASE("mapping shared memory") {
   SECTION("map a read only shared memory") {
     auto const name    = NAME;
-    auto shared_memory = shm::open(name, read_write | create, 0444);
+    auto shared_memory = shm::open(name, ReadWrite | Create, 0444);
     REQUIRE(shared_memory);
 
     auto truncate_result = shared_memory->truncate(8);
     CHECK(truncate_result);
 
-    auto map_address = shared_memory->map(8, read, map_private);
+    auto map_address = shared_memory->map(8, Read, MapPrivate);
     CHECK(map_address);
     CHECK(shm::unlink(name));
   }
   SECTION("map with 0 length should fail") {
     auto const name    = NAME;
-    auto shared_memory = shm::open(name, read_only | create, 0444);
+    auto shared_memory = shm::open(name, ReadOnly | Create, 0444);
     REQUIRE(shared_memory);
 
-    auto map_address = shared_memory->map(0, read, map_private);
+    auto map_address = shared_memory->map(0, Read, MapPrivate);
     CHECK_FALSE(map_address);
     CHECK(map_address.error() == shm::MapError::argument_invalid);
     CHECK(shm::unlink(name));
@@ -36,13 +36,13 @@ TEST_CASE("mapping shared memory") {
 TEST_CASE("unmapping shared memory") {
   SECTION("unmap a mapped shared memory") {
     auto const name    = NAME;
-    auto shared_memory = shm::open(name, read_write | create, 0444);
+    auto shared_memory = shm::open(name, ReadWrite | Create, 0444);
     REQUIRE(shared_memory);
 
     auto truncate_result = shared_memory->truncate(8);
     CHECK(truncate_result);
 
-    auto map_address = shared_memory->map(8, read, map_private);
+    auto map_address = shared_memory->map(8, Read, MapPrivate);
     CHECK(map_address);
     auto unmap_result = shm::unmap(*map_address, 8);
     CHECK(unmap_result);

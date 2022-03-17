@@ -137,34 +137,36 @@ private:
   shm(int fd) noexcept;
 
   int m_fd;
+
+  friend fcntl<shm>;
 };
 namespace shm_constants {
-constexpr shm::ReadOnlyMode read_only   = shm::ReadOnlyMode::read_only;
-constexpr shm::ReadWriteMode read_write = shm::ReadWriteMode::read_write;
-constexpr shm::CreateMode create        = shm::CreateMode::create;
-constexpr shm::ExclusiveMode exclusive  = shm::ExclusiveMode::exclusive;
-constexpr shm::TruncateMode truncate    = shm::TruncateMode::truncate;
+constexpr shm::ReadOnlyMode ReadOnly   = shm::ReadOnlyMode::read_only;
+constexpr shm::ReadWriteMode ReadWrite = shm::ReadWriteMode::read_write;
+constexpr shm::CreateMode Create       = shm::CreateMode::create;
+constexpr shm::ExclusiveMode Exclusive = shm::ExclusiveMode::exclusive;
+constexpr shm::TruncateMode Truncate   = shm::TruncateMode::truncate;
 
-constexpr shm::MapProtection exec  = shm::MapProtection::exec;
-constexpr shm::MapProtection read  = shm::MapProtection::read;
-constexpr shm::MapProtection write = shm::MapProtection::write;
+constexpr shm::MapProtection Exec  = shm::MapProtection::exec;
+constexpr shm::MapProtection Read  = shm::MapProtection::read;
+constexpr shm::MapProtection Write = shm::MapProtection::write;
 
-constexpr shm::MapFlag shared          = shm::MapFlag::shared;
-constexpr shm::MapFlag shared_validate = shm::MapFlag::shared_validate;
-constexpr shm::MapFlag map_private     = shm::MapFlag::map_private;
+constexpr shm::MapFlag Shared         = shm::MapFlag::shared;
+constexpr shm::MapFlag SharedValidate = shm::MapFlag::shared_validate;
+constexpr shm::MapFlag MapPrivate     = shm::MapFlag::map_private;
 
-constexpr shm::MapExtraFlag map_32bit = shm::MapExtraFlag::map_32bit;
-constexpr shm::MapExtraFlag anonymous = shm::MapExtraFlag::anonymous;
-constexpr shm::MapExtraFlag growsdown = shm::MapExtraFlag::growsdown;
-constexpr shm::MapExtraFlag hugetlb   = shm::MapExtraFlag::hugetlb;
-constexpr shm::MapExtraFlag locked    = shm::MapExtraFlag::locked;
-constexpr shm::MapExtraFlag nonblock  = shm::MapExtraFlag::nonblock;
-constexpr shm::MapExtraFlag noreserve = shm::MapExtraFlag::noreserve;
-constexpr shm::MapExtraFlag populate  = shm::MapExtraFlag::populate;
-constexpr shm::MapExtraFlag stack     = shm::MapExtraFlag::stack;
-constexpr shm::MapExtraFlag sync      = shm::MapExtraFlag::sync;
+constexpr shm::MapExtraFlag Map32bit  = shm::MapExtraFlag::map_32bit;
+constexpr shm::MapExtraFlag Anonymous = shm::MapExtraFlag::anonymous;
+constexpr shm::MapExtraFlag Growsdown = shm::MapExtraFlag::growsdown;
+constexpr shm::MapExtraFlag Hugetlb   = shm::MapExtraFlag::hugetlb;
+constexpr shm::MapExtraFlag Locked    = shm::MapExtraFlag::locked;
+constexpr shm::MapExtraFlag Nonblock  = shm::MapExtraFlag::nonblock;
+constexpr shm::MapExtraFlag Noreserve = shm::MapExtraFlag::noreserve;
+constexpr shm::MapExtraFlag Populate  = shm::MapExtraFlag::populate;
+constexpr shm::MapExtraFlag Stack     = shm::MapExtraFlag::stack;
+constexpr shm::MapExtraFlag Sync      = shm::MapExtraFlag::sync;
 #if defined MAP_UNINITIALIZED
-constexpr shm::MapExtraFlag uninitialized = shm::MapExtraFlag::uninitialized;
+constexpr shm::MapExtraFlag Uninitialized = shm::MapExtraFlag::uninitialized;
 #endif
 } // namespace shm_constants
 } // namespace lpipp
