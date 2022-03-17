@@ -1,8 +1,8 @@
 #pragma once
 
+#include "fcntl.hpp"
 #include "macros.hpp"
 
-#include <fcntl.h>
 #include <filesystem>
 #include <sys/mman.h>
 #include <tl/expected.hpp>
@@ -12,7 +12,7 @@
 #endif
 
 namespace lpipp {
-class shm {
+class shm : public fcntl<shm> {
 public:
   enum class OpenError {
     permission_denied                          = EACCES,
