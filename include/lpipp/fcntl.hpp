@@ -5,6 +5,7 @@
 #include <asm-generic/errno-base.h>
 #include <cerrno>
 #include <fcntl.h>
+#include <sys/stat.h>
 #include <system_error>
 #include <tl/expected.hpp>
 #include <type_traits>
@@ -18,12 +19,15 @@ struct fcntl {
     invalid_minimum_file_descriptor_number     = EINVAL,
     file_descriptors_per_process_limit_reached = EMFILE
   };
+  enum class StatError : int { memory_insufficient = ENOMEM };
 
   friend LPIPP_DECLARE_MAKE_ERROR_CODE(DupError);
   friend LPIPP_DECLARE_MAKE_ERROR_CODE(DupAtLeastError);
+  friend LPIPP_DECLARE_MAKE_ERROR_CODE(StatError);
 
   [[nodiscard]] static auto duplicate(int fd) noexcept -> tl::expected<int, std::error_code>;
   [[nodiscard]] static auto duplicate_at_least(int fd, int minimum_fd) noexcept -> tl::expected<int, DupAtLeastError>;
+  [[nodiscard]] static auto stat(int fd) noexcept -> tl::expected<struct ::stat, std::error_code>;
 };
 } // namespace detail
 
@@ -48,8 +52,13 @@ public:
     }
     return T{*result};
   }
+
+  [[nodiscard]] auto stat() const noexcept -> tl::expected<struct ::stat, std::error_code> {
+    return detail::fcntl::stat(get_handle());
+  }
 };
 } // namespace lpipp
 
 LPIPP_IS_ERROR_CODE(lpipp::detail::fcntl::DupError)
 LPIPP_IS_ERROR_CODE(lpipp::detail::fcntl::DupAtLeastError)
+LPIPP_IS_ERROR_CODE(lpipp::detail::fcntl::StatError)

@@ -29,8 +29,9 @@ function(lpipp_add_test name)
   add_dependencies(lpipp-tests ${name})
 endfunction()
 
-add_subdirectory(mq)
 add_subdirectory(epoll)
+add_subdirectory(fcntl)
+add_subdirectory(mq)
 add_subdirectory(shm)
 
 lpipp_add_test(lpipp-chrono-test chrono.test.cpp)
