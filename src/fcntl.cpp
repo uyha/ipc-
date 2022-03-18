@@ -3,7 +3,7 @@
 namespace {
 struct FcntlDuplicateErrorCategory : std::error_category {
   auto name() const noexcept -> char const * {
-    return "mq::DupError";
+    return "fcntl::DupError";
   }
   auto message(int error) const -> std::string {
     switch (static_cast<lpipp::detail::fcntl::DupError>(error)) {
@@ -16,7 +16,7 @@ struct FcntlDuplicateErrorCategory : std::error_category {
 
 struct FcntlDuplicateAtLeastErrorCategory : std::error_category {
   auto name() const noexcept -> char const * {
-    return "mq::DupAtLeastError";
+    return "fcntl::DupAtLeastError";
   }
   auto message(int error) const -> std::string {
     switch (static_cast<lpipp::detail::fcntl::DupAtLeastError>(error)) {
@@ -56,7 +56,7 @@ auto fcntl::duplicate(int fd) noexcept -> tl::expected<int, std::error_code> {
   return new_fd;
 }
 
-auto fcntl::duplicate_at_least(int fd, int minimum_fd) noexcept -> tl::expected<int, DupAtLeastError> {
+auto fcntl::duplicate_at_least(int fd, int minimum_fd) noexcept -> tl::expected<int, std::error_code> {
   auto new_fd = ::fcntl(fd, F_DUPFD, minimum_fd);
   if (new_fd == -1) {
     return tl::unexpected{static_cast<DupAtLeastError>(errno)};

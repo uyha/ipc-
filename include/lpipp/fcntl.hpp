@@ -26,7 +26,7 @@ struct fcntl {
   friend LPIPP_DECLARE_MAKE_ERROR_CODE(StatError);
 
   [[nodiscard]] static auto duplicate(int fd) noexcept -> tl::expected<int, std::error_code>;
-  [[nodiscard]] static auto duplicate_at_least(int fd, int minimum_fd) noexcept -> tl::expected<int, DupAtLeastError>;
+  [[nodiscard]] static auto duplicate_at_least(int fd, int minimum_fd) noexcept -> tl::expected<int, std::error_code>;
   [[nodiscard]] static auto stat(int fd) noexcept -> tl::expected<struct ::stat, std::error_code>;
 };
 } // namespace detail
