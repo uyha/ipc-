@@ -26,7 +26,9 @@ jobs:
           -DCMAKE_BUILD_TYPE=RELEASE -DPoetry_DIR=$HOME/.poetry/bin
           -DCMAKE_CXX_STANDARD=${{matrix.cpp_standard}}
           -DCMAKE_CXX_COMPILER=${{matrix.compiler.cxx}}
-      - name: Build
+      - name: Build tests
         run: cmake --build --preset test -j$(nproc)
       - name: Run tests
         run: ctest --preset default -j$(nproc)
+      - name: Build examples
+        run: cmake --build --preset example -j$(nproc)
