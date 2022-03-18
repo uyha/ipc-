@@ -5,7 +5,7 @@
 int main() {
   using namespace lpipp::mq_constants;
   namespace fs = std::filesystem;
-  auto mode    = read_only;
+  auto mode    = ReadOnly;
   auto permissions = fs::perms::owner_read;
   auto message_queue = lpipp::mq::open("/test", mode);
 
