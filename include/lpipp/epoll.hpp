@@ -1,6 +1,6 @@
 #pragma once
 #include "concepts.hpp"
-#include "fcntl.hpp"
+#include "file_descriptor.hpp"
 #include "macros.hpp"
 
 #include <asm-generic/errno-base.h>
@@ -29,7 +29,7 @@ constexpr auto set_epoll_event_data(::epoll_event &event, Data data) noexcept {
   }
 }
 
-class epoll : public fcntl<epoll> {
+class epoll : public FileDescriptor<epoll> {
 public:
   enum class CreateError {
     file_descriptors_per_process_limit_reached = EMFILE,
@@ -154,7 +154,7 @@ private:
 
   int m_fd;
 
-  friend fcntl<epoll>;
+  friend FileDescriptor<epoll>;
 
   [[nodiscard]] auto wait(::epoll_event *event_list,
                           int max_events,

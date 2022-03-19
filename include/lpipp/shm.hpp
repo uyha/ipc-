@@ -1,6 +1,6 @@
 #pragma once
 
-#include "fcntl.hpp"
+#include "file_descriptor.hpp"
 #include "macros.hpp"
 
 #include <filesystem>
@@ -12,7 +12,7 @@
 #endif
 
 namespace lpipp {
-class shm : public fcntl<shm> {
+class shm : public FileDescriptor<shm> {
 public:
   enum class OpenError {
     permission_denied                          = EACCES,
@@ -138,7 +138,7 @@ private:
 
   int m_fd;
 
-  friend fcntl<shm>;
+  friend FileDescriptor<shm>;
 };
 namespace shm_constants {
 constexpr shm::ReadOnlyMode ReadOnly   = shm::ReadOnlyMode::read_only;

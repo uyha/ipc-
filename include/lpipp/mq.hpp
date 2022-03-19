@@ -1,7 +1,7 @@
 #pragma once
 
 #include "chrono.hpp"
-#include "fcntl.hpp"
+#include "file_descriptor.hpp"
 #include "macros.hpp"
 
 #include <filesystem>
@@ -12,7 +12,7 @@
 #include <type_traits>
 
 namespace lpipp {
-class mq : public fcntl<mq> {
+class mq : public FileDescriptor<mq> {
 public:
   enum class OpenError {
     permission_denied                          = EACCES,
@@ -189,7 +189,7 @@ private:
 
   int m_fd;
 
-  friend fcntl<mq>;
+  friend FileDescriptor<mq>;
 
   [[nodiscard]] static constexpr auto valid_name(char const *name) noexcept -> bool {
     if (name[0] != '/') {

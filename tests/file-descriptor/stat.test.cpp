@@ -7,7 +7,7 @@
 using namespace lpipp;
 using namespace shm_constants;
 
-TEST_CASE("fcntl stat") {
+TEST_CASE("file_descriptor stat") {
   auto const name = NAME;
 
   auto const shared_memory = shm::open(name, ReadWrite | Create, 0600);

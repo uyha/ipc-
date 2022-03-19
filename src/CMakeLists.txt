@@ -18,18 +18,18 @@ function(lpipp_add_library name)
   target_compile_options(${name} PRIVATE ${warnings} ${wae})
 endfunction()
 
-lpipp_add_library(lpipp-detail-fcntl fcntl.cpp)
-add_library(lpipp::detail::fcntl ALIAS lpipp-detail-fcntl)
+lpipp_add_library(lpipp-detail-file-descriptor file_descriptor.cpp)
+add_library(lpipp::detail::file-descriptor ALIAS lpipp-detail-file-descriptor)
 
 lpipp_add_library(lpipp-mq mq.cpp)
 add_library(lpipp::mq ALIAS lpipp-mq)
-target_link_libraries(lpipp-mq PRIVATE rt lpipp::detail::fcntl)
+target_link_libraries(lpipp-mq PRIVATE rt lpipp::detail::file-descriptor)
 
 lpipp_add_library(lpipp-epoll epoll.cpp)
 add_library(lpipp::epoll ALIAS lpipp-epoll)
-target_link_libraries(lpipp-epoll PRIVATE rt lpipp::detail::fcntl)
+target_link_libraries(lpipp-epoll PRIVATE rt lpipp::detail::file-descriptor)
 target_compile_options(lpipp-epoll PUBLIC ${LPIPP_CONCEPT})
 
 lpipp_add_library(lpipp-shm shm.cpp)
 add_library(lpipp::shm ALIAS lpipp-shm)
-target_link_libraries(lpipp-shm PRIVATE rt lpipp::detail::fcntl)
+target_link_libraries(lpipp-shm PRIVATE rt lpipp::detail::file-descriptor)

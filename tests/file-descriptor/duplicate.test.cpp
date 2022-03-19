@@ -7,7 +7,7 @@
 using namespace lpipp;
 using namespace shm_constants;
 
-TEST_CASE("fcntl duplicate") {
+TEST_CASE("file_descriptor duplicate") {
   auto const name = NAME;
 
   auto const shared_memory = shm::open(name, ReadWrite | Create, 600);
@@ -23,7 +23,7 @@ TEST_CASE("fcntl duplicate") {
 
   CHECK(shm::unlink(name));
 }
-TEST_CASE("fcntl duplicate at least") {
+TEST_CASE("file_descriptor duplicate at least") {
   auto const name = NAME;
 
   auto const shared_memory = shm::open(name, ReadWrite | Create, 600);

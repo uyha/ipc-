@@ -30,7 +30,7 @@ function(lpipp_add_test name)
 endfunction()
 
 add_subdirectory(epoll)
-add_subdirectory(fcntl)
+add_subdirectory(file-descriptor)
 add_subdirectory(mq)
 add_subdirectory(shm)
 

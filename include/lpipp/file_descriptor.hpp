@@ -13,7 +13,7 @@
 
 namespace lpipp {
 namespace detail {
-struct fcntl {
+struct FileDescriptor {
   enum class DupError : int { file_descriptors_per_process_limit_reached = EMFILE };
   enum class DupAtLeastError : int {
     invalid_minimum_file_descriptor_number     = EINVAL,
@@ -32,13 +32,13 @@ struct fcntl {
 } // namespace detail
 
 template <typename T>
-class fcntl {
+class FileDescriptor {
 public:
   auto get_handle() const noexcept -> int {
     return static_cast<T const &>(*this).m_fd;
   }
   [[nodiscard]] auto duplicate() const noexcept -> tl::expected<T, std::error_code> {
-    auto result = detail::fcntl::duplicate(get_handle());
+    auto result = detail::FileDescriptor::duplicate(get_handle());
     if (not result) {
       return tl::unexpected{result.error()};
     }
@@ -46,7 +46,7 @@ public:
     return T{*result};
   }
   [[nodiscard]] auto duplicate_at_least(int minimum_fd) const noexcept -> tl::expected<T, std::error_code> {
-    auto result = detail::fcntl::duplicate_at_least(get_handle(), minimum_fd);
+    auto result = detail::FileDescriptor::duplicate_at_least(get_handle(), minimum_fd);
     if (not result) {
       return tl::unexpected{result.error()};
     }
@@ -54,11 +54,11 @@ public:
   }
 
   [[nodiscard]] auto stat() const noexcept -> tl::expected<struct ::stat, std::error_code> {
-    return detail::fcntl::stat(get_handle());
+    return detail::FileDescriptor::stat(get_handle());
   }
 };
 } // namespace lpipp
 
-LPIPP_IS_ERROR_CODE(lpipp::detail::fcntl::DupError)
-LPIPP_IS_ERROR_CODE(lpipp::detail::fcntl::DupAtLeastError)
-LPIPP_IS_ERROR_CODE(lpipp::detail::fcntl::StatError)
+LPIPP_IS_ERROR_CODE(lpipp::detail::FileDescriptor::DupError)
+LPIPP_IS_ERROR_CODE(lpipp::detail::FileDescriptor::DupAtLeastError)
+LPIPP_IS_ERROR_CODE(lpipp::detail::FileDescriptor::StatError)
