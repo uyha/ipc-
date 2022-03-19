@@ -6,6 +6,7 @@
 #include <cerrno>
 #include <fcntl.h>
 #include <sys/stat.h>
+#include <sys/types.h>
 #include <system_error>
 #include <tl/expected.hpp>
 #include <type_traits>
@@ -19,12 +20,14 @@ enum class DupAtLeastError : int {
 };
 enum class StatError : int { memory_insufficient = ENOMEM };
 enum class ChownError : int { memory_insufficient = ENOMEM, permission_denied = EPERM };
+enum class ChmodError : int { memory_insufficient = ENOMEM, permission_denied = EPERM };
 } // namespace lpipp
 
 LPIPP_IS_ERROR_CODE(lpipp::DupError)
 LPIPP_IS_ERROR_CODE(lpipp::DupAtLeastError)
 LPIPP_IS_ERROR_CODE(lpipp::StatError)
 LPIPP_IS_ERROR_CODE(lpipp::ChownError)
+LPIPP_IS_ERROR_CODE(lpipp::ChmodError)
 
 namespace lpipp {
 
@@ -32,6 +35,7 @@ LPIPP_DECLARE_MAKE_ERROR_CODE(DupError);
 LPIPP_DECLARE_MAKE_ERROR_CODE(DupAtLeastError);
 LPIPP_DECLARE_MAKE_ERROR_CODE(StatError);
 LPIPP_DECLARE_MAKE_ERROR_CODE(ChownError);
+LPIPP_DECLARE_MAKE_ERROR_CODE(ChmodError);
 
 template <typename T>
 class FileDescriptor {
@@ -67,6 +71,14 @@ public:
     auto result = ::fchown(get_handle(), user, group);
     if (result == -1) {
       return tl::unexpected{static_cast<ChownError>(errno)};
+    }
+    return {};
+  }
+
+  [[nodiscard]] auto chmod(::mode_t mode) const noexcept -> tl::expected<void, std::error_code> {
+    auto result = ::fchmod(get_handle(), mode);
+    if (result == -1) {
+      return tl::unexpected{static_cast<ChmodError>(errno)};
     }
     return {};
   }
