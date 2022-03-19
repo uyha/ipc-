@@ -37,10 +37,20 @@
     }
   ],
   "testPresets": [{
-    "name": "default",
-    "configurePreset": "dummy",
-    "output": {
-      "outputOnFailure": true
+      "name": "default",
+      "configurePreset": "dummy",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "ci",
+      "inherits": "default",
+      "filter": {
+        "exclude": {
+          "name": "(file_descriptor chown)"
+        }
+      }
     }
-  }]
+  ]
 }

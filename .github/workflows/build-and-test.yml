@@ -29,6 +29,6 @@ jobs:
       - name: Build tests
         run: cmake --build --preset test -j$(nproc)
       - name: Run tests
-        run: ctest --preset default -j$(nproc) -E 'file_descriptor chown'
+        run: ctest --preset ci -j$(nproc)
       - name: Build examples
         run: cmake --build --preset example -j$(nproc)
