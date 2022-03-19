@@ -48,6 +48,7 @@
       "inherits": "default",
       "filter": {
         "exclude": {
+          "name": "file_descriptor chown|file_descriptor chmod"
         }
       }
     }

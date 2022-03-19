@@ -35,7 +35,11 @@ TEST_CASE("file_descriptor chmod") {
   auto epoll = epoll::create();
   REQUIRE(epoll);
   auto result = epoll->chmod(0666);
-  CHECKED_IF(result) {}
+  CHECKED_IF(result) {
+    auto stat = epoll->stat();
+    CHECK(stat);
+    CHECK(stat->st_mode == 0666);
+  }
   CHECKED_ELSE(result) {
     CHECK(result.error() == ChmodError::permission_denied);
   }
