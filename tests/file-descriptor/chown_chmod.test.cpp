@@ -13,12 +13,15 @@ TEST_CASE("file_descriptor chown") {
     auto gid = ::getgid();
 
     auto result = epoll->chown(uid, gid);
-    CHECK(result);
-
-    auto stat = epoll->stat();
-    CHECK(stat);
-    CHECK(stat->st_uid == uid);
-    CHECK(stat->st_gid == gid);
+    CHECKED_IF(result) {
+      auto stat = epoll->stat();
+      CHECK(stat);
+      CHECK(stat->st_uid == uid);
+      CHECK(stat->st_gid == gid);
+    }
+    CHECKED_ELSE(result) {
+      CHECK(result.error() == ChownError::permission_denied);
+    }
   }
 
   SECTION("setting uid and gid to root should fail") {
@@ -31,5 +34,9 @@ TEST_CASE("file_descriptor chown") {
 TEST_CASE("file_descriptor chmod") {
   auto epoll = epoll::create();
   REQUIRE(epoll);
-  CHECK(epoll->chmod(0666));
+  auto result = epoll->chmod(0666);
+  CHECKED_IF(result) {}
+  CHECKED_ELSE(result) {
+    CHECK(result.error() == ChmodError::permission_denied);
+  }
 }
