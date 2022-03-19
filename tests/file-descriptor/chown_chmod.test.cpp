@@ -8,14 +8,22 @@ TEST_CASE("file_descriptor chown") {
   auto epoll = epoll::create();
   REQUIRE(epoll);
 
-  auto uid = ::getuid();
-  auto gid = ::getgid();
+  SECTION("setting uid and gid to current") {
+    auto uid = ::getuid();
+    auto gid = ::getgid();
 
-  auto result = epoll->chown(uid, gid);
-  CHECK(result);
+    auto result = epoll->chown(uid, gid);
+    CHECK(result);
 
-  auto stat = epoll->stat();
-  CHECK(stat);
-  CHECK(stat->st_uid == uid);
-  CHECK(stat->st_gid == gid);
+    auto stat = epoll->stat();
+    CHECK(stat);
+    CHECK(stat->st_uid == uid);
+    CHECK(stat->st_gid == gid);
+  }
+
+  SECTION("setting uid and gid to root") {
+    auto result = epoll->chown(0, 0);
+    CHECK_FALSE(result);
+    CHECK(result.error() == ChownError::permission_denied);
+  }
 }
