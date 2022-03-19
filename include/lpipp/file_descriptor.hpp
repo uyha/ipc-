@@ -12,24 +12,26 @@
 #include <unistd.h>
 
 namespace lpipp {
-namespace detail {
-struct FileDescriptor {
-  enum class DupError : int { file_descriptors_per_process_limit_reached = EMFILE };
-  enum class DupAtLeastError : int {
-    invalid_minimum_file_descriptor_number     = EINVAL,
-    file_descriptors_per_process_limit_reached = EMFILE
-  };
-  enum class StatError : int { memory_insufficient = ENOMEM };
-
-  friend LPIPP_DECLARE_MAKE_ERROR_CODE(DupError);
-  friend LPIPP_DECLARE_MAKE_ERROR_CODE(DupAtLeastError);
-  friend LPIPP_DECLARE_MAKE_ERROR_CODE(StatError);
-
-  [[nodiscard]] static auto duplicate(int fd) noexcept -> tl::expected<int, std::error_code>;
-  [[nodiscard]] static auto duplicate_at_least(int fd, int minimum_fd) noexcept -> tl::expected<int, std::error_code>;
-  [[nodiscard]] static auto stat(int fd) noexcept -> tl::expected<struct ::stat, std::error_code>;
+enum class DupError : int { file_descriptors_per_process_limit_reached = EMFILE };
+enum class DupAtLeastError : int {
+  invalid_minimum_file_descriptor_number     = EINVAL,
+  file_descriptors_per_process_limit_reached = EMFILE
 };
-} // namespace detail
+enum class StatError : int { memory_insufficient = ENOMEM };
+enum class ChownError : int { memory_insufficient = ENOMEM, permission_denied = EPERM };
+} // namespace lpipp
+
+LPIPP_IS_ERROR_CODE(lpipp::DupError)
+LPIPP_IS_ERROR_CODE(lpipp::DupAtLeastError)
+LPIPP_IS_ERROR_CODE(lpipp::StatError)
+LPIPP_IS_ERROR_CODE(lpipp::ChownError)
+
+namespace lpipp {
+
+LPIPP_DECLARE_MAKE_ERROR_CODE(DupError);
+LPIPP_DECLARE_MAKE_ERROR_CODE(DupAtLeastError);
+LPIPP_DECLARE_MAKE_ERROR_CODE(StatError);
+LPIPP_DECLARE_MAKE_ERROR_CODE(ChownError);
 
 template <typename T>
 class FileDescriptor {
@@ -38,27 +40,35 @@ public:
     return static_cast<T const &>(*this).m_fd;
   }
   [[nodiscard]] auto duplicate() const noexcept -> tl::expected<T, std::error_code> {
-    auto result = detail::FileDescriptor::duplicate(get_handle());
-    if (not result) {
-      return tl::unexpected{result.error()};
+    auto new_fd = ::dup(get_handle());
+    if (new_fd == -1) {
+      return tl::unexpected{static_cast<DupError>(errno)};
     }
-
-    return T{*result};
+    return T{new_fd};
   }
   [[nodiscard]] auto duplicate_at_least(int minimum_fd) const noexcept -> tl::expected<T, std::error_code> {
-    auto result = detail::FileDescriptor::duplicate_at_least(get_handle(), minimum_fd);
-    if (not result) {
-      return tl::unexpected{result.error()};
+    auto new_fd = ::fcntl(get_handle(), F_DUPFD, minimum_fd);
+    if (new_fd == -1) {
+      return tl::unexpected{static_cast<DupAtLeastError>(errno)};
     }
-    return T{*result};
+    return T{new_fd};
   }
 
   [[nodiscard]] auto stat() const noexcept -> tl::expected<struct ::stat, std::error_code> {
-    return detail::FileDescriptor::stat(get_handle());
+    struct ::stat stat_buffer {};
+    auto new_fd = ::fstat(get_handle(), &stat_buffer);
+    if (new_fd == -1) {
+      return tl::unexpected{static_cast<StatError>(errno)};
+    }
+    return stat_buffer;
+  }
+
+  [[nodiscard]] auto chown(::uid_t user, ::gid_t group) const noexcept -> tl::expected<void, std::error_code> {
+    auto result = ::fchown(get_handle(), user, group);
+    if (result == -1) {
+      return tl::unexpected{static_cast<ChownError>(errno)};
+    }
+    return {};
   }
 };
 } // namespace lpipp
-
-LPIPP_IS_ERROR_CODE(lpipp::detail::FileDescriptor::DupError)
-LPIPP_IS_ERROR_CODE(lpipp::detail::FileDescriptor::DupAtLeastError)
-LPIPP_IS_ERROR_CODE(lpipp::detail::FileDescriptor::StatError)

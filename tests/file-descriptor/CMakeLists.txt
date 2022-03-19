@@ -1,4 +1,5 @@
 lpipp_add_test(lpipp-file-descriptor-test
+  chown_chmod.test.cpp
   duplicate.test.cpp
   stat.test.cpp
 )
