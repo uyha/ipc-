@@ -56,7 +56,7 @@ TEST_CASE("register notification of a message queue") {
     REQUIRE(attributes.mq_curmsgs == 0);
     REQUIRE(queue->notify([](::sigval) { mq_thread_callback_called = true; }));
     CHECK(queue->send(name, 1));
-    std::this_thread::sleep_for(1ms);
+    std::this_thread::sleep_for(5ms);
     CHECK(mq_thread_callback_called);
     CHECK(mq::unlink(name));
   }
@@ -67,7 +67,7 @@ TEST_CASE("register notification of a message queue") {
     REQUIRE(attributes.mq_curmsgs == 0);
     REQUIRE(queue->notify([](::sigval val) { mq_thread_callback_int = val.sival_int; }, 1));
     CHECK(queue->send(name, 1));
-    std::this_thread::sleep_for(1ms);
+    std::this_thread::sleep_for(5ms);
     CHECK(mq_thread_callback_int == 1);
     CHECK(mq::unlink(name));
   }
