@@ -33,3 +33,6 @@ target_compile_options(lpipp-epoll PUBLIC ${LPIPP_CONCEPT})
 lpipp_add_library(lpipp-shm shm.cpp)
 add_library(lpipp::shm ALIAS lpipp-shm)
 target_link_libraries(lpipp-shm PRIVATE rt lpipp::detail::file-descriptor)
+
+lpipp_add_library(lpipp-un un.cpp)
+add_library(lpipp::un ALIAS lpipp-un)
