@@ -13,13 +13,12 @@ TEST_CASE("file_descriptor chown") {
     auto gid = ::getgid();
 
     auto result = epoll->chown(uid, gid);
-    CHECKED_IF(result) {
+    if (result) {
       auto stat = epoll->stat();
       CHECK(stat);
       CHECK(stat->st_uid == uid);
       CHECK(stat->st_gid == gid);
-    }
-    CHECKED_ELSE(result) {
+    } else {
       CHECK(result.error() == ChownError::permission_denied);
     }
   }
@@ -35,12 +34,11 @@ TEST_CASE("file_descriptor chmod") {
   auto epoll = epoll::create();
   REQUIRE(epoll);
   auto result = epoll->chmod(0666);
-  CHECKED_IF(result) {
+  if (result) {
     auto stat = epoll->stat();
     CHECK(stat);
     CHECK(stat->st_mode == 0666);
-  }
-  CHECKED_ELSE(result) {
+  } else {
     CHECK(result.error() == ChmodError::permission_denied);
   }
 }
