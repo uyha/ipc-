@@ -1,4 +1,5 @@
 #include <catch2/catch.hpp>
+#include <filesystem>
 #include <lpipp-test/macros.hpp>
 #include <lpipp/un.hpp>
 
@@ -48,5 +49,32 @@ TEST_CASE("binding a unix socket") {
     auto result = socket->bind("/dev/null" NAME);
     CHECK_FALSE(result);
     CHECK(result.error() == un::BindError::not_directory);
+  }
+  SECTION("move constructor should delete the path according to scope") {
+    auto const name = NAME;
+    auto result     = socket->bind(name);
+    CHECK(result);
+    {
+      auto steal = std::move(*socket);
+      CHECK(std::filesystem::exists(name));
+    }
+    CHECK_FALSE(std::filesystem::exists(name));
+  }
+  SECTION("move assignment operator should delete the path according to scope") {
+    auto const first_name = NAME;
+    auto result           = socket->bind(first_name);
+    CHECK(result);
+
+    {
+      auto another_socket    = un::create(Dgram);
+      auto const second_name = NAME;
+
+      CHECK(another_socket);
+      CHECK(another_socket->bind(second_name));
+
+      another_socket = std::move(*socket);
+      CHECK_FALSE(std::filesystem::exists(second_name));
+    }
+    CHECK_FALSE(std::filesystem::exists(first_name));
   }
 }

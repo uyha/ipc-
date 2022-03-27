@@ -50,6 +50,7 @@ public:
   static auto create(SocketType socket_type) noexcept -> tl::expected<un, std::error_code>;
 
   auto bind(std::string_view address) noexcept -> tl::expected<void, std::error_code>;
+  auto bind_abstract(std::string_view address) noexcept -> tl::expected<void, std::error_code>;
 
   un(un const &)                     = delete;
   auto operator=(un const &) -> un & = delete;
@@ -66,7 +67,7 @@ private:
 
   int m_fd;
   char m_address[max_length + 1];
-  bool m_bound = false;
+  bool m_address_bound = false;
 
   friend FileDescriptor<un>;
 };
