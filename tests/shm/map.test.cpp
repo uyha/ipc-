@@ -1,9 +1,9 @@
 #include <catch2/catch.hpp>
 #include <filesystem>
+#include <lpipp-test/macros.hpp>
 #include <lpipp/shm.hpp>
 
-#define QUOTE(s) #s
-#define NAME "/shm.map" QUOTE(__LINE__)
+#define NAME UNIQUE_STR_IMPL("/shm.map", __LINE__)
 
 using namespace lpipp;
 using namespace shm_constants;

@@ -1,8 +1,8 @@
 #include <catch2/catch.hpp>
+#include <lpipp-test/macros.hpp>
 #include <lpipp/shm.hpp>
 
-#define QUOTE(s) #s
-#define NAME "/fcntl.stat" QUOTE(__LINE__)
+#define NAME UNIQUE_STR_IMPL("/fcntl.stat", __LINE__)
 
 using namespace lpipp;
 using namespace shm_constants;

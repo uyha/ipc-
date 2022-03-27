@@ -21,6 +21,7 @@ add_custom_target(lpipp-tests)
 function(lpipp_add_test name)
   add_executable(${name} EXCLUDE_FROM_ALL ${ARGN})
   target_link_libraries(${name} PRIVATE lpipp::test::main)
+  target_include_directories(${name} PRIVATE ${CMAKE_SOURCE_DIR}/tests/include)
   target_compile_features(${name} PRIVATE cxx_std_20)
   target_compile_options(${name} PRIVATE ${warnings})
   catch_discover_tests(${name}
