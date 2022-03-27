@@ -1,4 +1,5 @@
-#include <lpipp/un.h>
+#include <cstring>
+#include <lpipp/un.hpp>
 #include <unistd.h>
 
 namespace {
@@ -20,10 +21,36 @@ struct CreateErrorCategory : std::error_category {
   }
 } const un_create_error_category{};
 
+struct BindErrorCategory : std::error_category {
+  auto name() const noexcept -> char const * {
+    return "un::BindError";
+  }
+  auto message(int error) const -> std::string {
+    switch (static_cast<lpipp::un::BindError>(error)) {
+    case lpipp::un::BindError::access_denied:
+      return "The address is protected and the user is not the superuser, or the caller does not have search "
+             "permission on the path prefix";
+    case lpipp::un::BindError::address_in_use: return "The given address is already in use";
+    case lpipp::un::BindError::invalid: return "Socket is already bound to another address, or address is invalid";
+    case lpipp::un::BindError::address_not_available:
+      return "A nonexistent interface was requested or the requested address was not local";
+    case lpipp::un::BindError::loop_detected: return "Too many symbolic links were encountered in resolving address";
+    case lpipp::un::BindError::name_too_long: return "address is too long";
+    case lpipp::un::BindError::directory_not_exist:
+      return "A component in the directory prefix of the socket pathname does not exist";
+    case lpipp::un::BindError::memory_insufficient: return "Insufficient kernel memory was available";
+    case lpipp::un::BindError::not_directory: return "A component of the path prefix is not a directory";
+    case lpipp::un::BindError::filesystem_readonly: return "The socket inode would reside on a read-only filesystem";
+    default: return "Unknown error";
+    }
+  }
+} const un_bind_error_category{};
+
 } // namespace
 
 namespace lpipp {
 LPIPP_DEFINE_MAKE_ERROR_CODE(un::CreateError, un_create_error_category)
+LPIPP_DEFINE_MAKE_ERROR_CODE(un::BindError, un_bind_error_category)
 
 auto un::create(SocketType socket_type) noexcept -> tl::expected<un, std::error_code> {
   auto fd = ::socket(AF_UNIX, static_cast<int>(socket_type), 0);
@@ -32,6 +59,32 @@ auto un::create(SocketType socket_type) noexcept -> tl::expected<un, std::error_
   }
 
   return un{fd};
+}
+
+auto un::bind(std::string_view address) noexcept -> tl::expected<void, std::error_code> {
+  if (address.length() > max_length) {
+    return tl::unexpected{BindError::name_too_long};
+  }
+
+  ::sockaddr_un socket_address{};
+  socket_address.sun_family                   = AF_UNIX;
+  socket_address.sun_path[std::size(address)] = '\0';
+  std::memcpy(socket_address.sun_path, std::data(address), std::size(address));
+
+  auto const result = ::bind(m_fd, reinterpret_cast<::sockaddr *>(&socket_address), sizeof(::sockaddr_un));
+  if (result == -1) {
+    auto const error = static_cast<BindError>(errno);
+    // When the socket is bound more than once, an error will occur, but the specified path will still be created
+    if (error == BindError::invalid) {
+      ::remove(socket_address.sun_path);
+    }
+    return tl::unexpected{error};
+  }
+
+  m_bound = true;
+  std::memcpy(m_address, socket_address.sun_path, std::size(address) + 1);
+
+  return {};
 }
 
 un::un(un &&other) noexcept
@@ -48,6 +101,9 @@ auto un::operator=(un &&other) noexcept -> un & {
 un::~un() noexcept {
   if (m_fd == -1) {
     return;
+  }
+  if (m_bound) {
+    ::remove(m_address);
   }
   ::close(m_fd);
 }

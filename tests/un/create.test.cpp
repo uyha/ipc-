@@ -1,5 +1,5 @@
 #include <catch2/catch.hpp>
-#include <lpipp/un.h>
+#include <lpipp/un.hpp>
 
 using namespace lpipp;
 using namespace un_constants;

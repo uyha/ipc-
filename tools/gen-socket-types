@@ -1,0 +1,35 @@
+#!/usr/bin/env python3
+
+from itertools import permutations
+from gen_permutations import gen_permutations
+
+modes = {
+    "Stream": "SOCK_STREAM",
+    "Dgram": "SOCK_DGRAM",
+    "SeqPacket": "SOCK_SEQPACKET",
+    "NonBlock": "SOCK_NONBLOCK",
+    "CloseOnExec": "SOCK_CLOEXEC",
+}
+
+case_sets = [
+    ["Stream", "NonBlock", "CloseOnExec"],
+    ["Dgram", "NonBlock", "CloseOnExec"],
+    ["SeqPacket", "NonBlock", "CloseOnExec"],
+]
+
+print(
+    """#include <catch2/catch.hpp>
+#include <lpipp/un.hpp>
+
+using namespace lpipp;
+using namespace un_constants;
+
+TEST_CASE("unix socket type bitor operations") {"""
+)
+
+for permutation, case in gen_permutations(case_sets):
+    print(
+        f"""  CHECK(static_cast<std::uint32_t>({" | ".join(permutation)}) == static_cast<std::uint32_t>({" | ".join(map(modes.__getitem__, case))}));"""
+    )
+
+print("}")
