@@ -184,6 +184,8 @@ shm::shm(shm &&other) noexcept
   other.m_fd = -1;
 }
 auto shm::operator=(shm &&other) noexcept -> shm & {
+  this->~shm();
+
   m_fd       = other.m_fd;
   other.m_fd = -1;
 

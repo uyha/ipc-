@@ -138,6 +138,8 @@ epoll::epoll(epoll &&other) noexcept
   other.m_fd = -1;
 }
 auto epoll::operator=(epoll &&other) noexcept -> epoll & {
+  this->~epoll();
+
   m_fd       = other.m_fd;
   other.m_fd = -1;
 
