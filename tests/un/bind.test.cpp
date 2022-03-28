@@ -78,3 +78,36 @@ TEST_CASE("binding a unix socket") {
     CHECK_FALSE(std::filesystem::exists(first_name));
   }
 }
+
+TEST_CASE("abstract binding a unix socket") {
+  auto socket = un::create(Dgram);
+  REQUIRE(socket);
+
+  SECTION("empty address") {
+    CHECK(socket->bind_abstract(""));
+  }
+  SECTION("binding twice should fail") {
+    CHECK(socket->bind_abstract(""));
+    auto const result = socket->bind_abstract(NAME);
+    CHECK_FALSE(result);
+    CHECK(result.error() == un::AbstractBindError::invalid);
+  }
+  SECTION("binding to the same address should fail") {
+    auto const address = NAME;
+    CHECK(socket->bind_abstract(address));
+
+    auto another_socket = un::create(Dgram);
+    CHECK(another_socket);
+
+    auto const result = another_socket->bind_abstract(address);
+    CHECK_FALSE(result);
+    CHECK(result.error() == un::AbstractBindError::address_in_use);
+  }
+  SECTION("binding with too long name should fail") {
+    auto const address =
+        "iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii";
+    auto const result = socket->bind_abstract(address);
+    CHECK_FALSE(result);
+    CHECK(result.error() == un::AbstractBindError::name_too_long);
+  }
+}

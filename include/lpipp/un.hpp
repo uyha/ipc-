@@ -30,9 +30,16 @@ public:
     not_directory         = ENOTDIR,
     filesystem_readonly   = EROFS,
   };
+  enum class AbstractBindError {
+    address_in_use      = EADDRINUSE,
+    invalid             = EINVAL,
+    name_too_long       = ENAMETOOLONG,
+    memory_insufficient = ENOMEM,
+  };
 
   friend LPIPP_DECLARE_MAKE_ERROR_CODE(CreateError);
   friend LPIPP_DECLARE_MAKE_ERROR_CODE(BindError);
+  friend LPIPP_DECLARE_MAKE_ERROR_CODE(AbstractBindError);
 
   enum class SocketType : int {
     stream    = SOCK_STREAM,
@@ -83,3 +90,4 @@ constexpr un::SocketFlag CloseOnExec = un::SocketFlag::close_on_exec;
 
 LPIPP_IS_ERROR_CODE(lpipp::un::CreateError)
 LPIPP_IS_ERROR_CODE(lpipp::un::BindError)
+LPIPP_IS_ERROR_CODE(lpipp::un::AbstractBindError)
