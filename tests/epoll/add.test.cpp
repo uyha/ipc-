@@ -55,5 +55,5 @@ TEST_CASE("add to epoll") {
     REQUIRE_FALSE(second_add);
     CHECK(second_add.error() == epoll::AddError::loop_detected);
   }
-  CHECK(mq::unlink(queue_name));
+  (void)mq::unlink(queue_name);
 }
