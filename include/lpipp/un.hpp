@@ -73,8 +73,6 @@ private:
   un(int fd) noexcept;
 
   int m_fd;
-  char m_address[max_length + 1];
-  bool m_address_bound = false;
 
   friend FileDescriptor<un>;
 };

@@ -13,7 +13,9 @@ TEST_CASE("binding a unix socket") {
   REQUIRE(socket);
 
   SECTION("normal binding") {
-    auto result = socket->bind(NAME);
+    auto address = NAME;
+    ::unlink(address);
+    auto result = socket->bind(address);
     CHECK(result);
   }
   SECTION("binding to non existing directory should fail") {
@@ -27,13 +29,18 @@ TEST_CASE("binding a unix socket") {
     CHECK(result.error() == un::BindError::access_denied);
   }
   SECTION("binding twice should fail") {
-    CHECK(socket->bind(NAME));
-    auto result = socket->bind(NAME);
+    auto name = NAME;
+    ::unlink(name);
+    CHECK(socket->bind(name));
+    name = NAME;
+    ::unlink(name);
+    auto result = socket->bind(name);
     CHECK_FALSE(result);
     CHECK(result.error() == un::BindError::invalid);
   }
   SECTION("binding to the same address should fail") {
     auto const address = NAME;
+    ::unlink(address);
     CHECK(socket->bind(address));
     auto result = socket->bind(address);
     CHECK_FALSE(result);
@@ -49,33 +56,6 @@ TEST_CASE("binding a unix socket") {
     auto result = socket->bind("/dev/null" NAME);
     CHECK_FALSE(result);
     CHECK(result.error() == un::BindError::not_directory);
-  }
-  SECTION("move constructor should delete the path according to scope") {
-    auto const name = NAME;
-    auto result     = socket->bind(name);
-    CHECK(result);
-    {
-      auto steal = std::move(*socket);
-      CHECK(std::filesystem::exists(name));
-    }
-    CHECK_FALSE(std::filesystem::exists(name));
-  }
-  SECTION("move assignment operator should delete the path according to scope") {
-    auto const first_name = NAME;
-    auto result           = socket->bind(first_name);
-    CHECK(result);
-
-    {
-      auto another_socket    = un::create(Dgram);
-      auto const second_name = NAME;
-
-      CHECK(another_socket);
-      CHECK(another_socket->bind(second_name));
-
-      another_socket = std::move(*socket);
-      CHECK_FALSE(std::filesystem::exists(second_name));
-    }
-    CHECK_FALSE(std::filesystem::exists(first_name));
   }
 }
 

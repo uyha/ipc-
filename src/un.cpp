@@ -98,9 +98,6 @@ auto un::bind(std::string_view address) noexcept -> tl::expected<void, std::erro
     return tl::unexpected{error};
   }
 
-  m_address_bound = true;
-  std::memcpy(m_address, socket_address.sun_path, std::size(address) + 1);
-
   return {};
 }
 
@@ -125,22 +122,14 @@ auto un::bind_abstract(std::string_view address) noexcept -> tl::expected<void, 
 }
 
 un::un(un &&other) noexcept
-    : m_fd{other.m_fd}
-    , m_address_bound{other.m_address_bound} {
-  std::memcpy(m_address, other.m_address, std::size(m_address));
-
-  other.m_fd            = -1;
-  other.m_address_bound = false;
+    : m_fd{other.m_fd} {
+  other.m_fd = -1;
 }
 auto un::operator=(un &&other) noexcept -> un & {
   this->~un();
 
-  m_fd            = other.m_fd;
-  m_address_bound = other.m_address_bound;
-  std::memcpy(m_address, other.m_address, std::size(m_address));
-
-  other.m_fd            = -1;
-  other.m_address_bound = false;
+  m_fd       = other.m_fd;
+  other.m_fd = -1;
 
   return *this;
 }
@@ -148,9 +137,6 @@ auto un::operator=(un &&other) noexcept -> un & {
 un::~un() noexcept {
   if (m_fd == -1) {
     return;
-  }
-  if (m_address_bound) {
-    ::remove(m_address);
   }
   ::close(m_fd);
 }
