@@ -1,5 +1,6 @@
 #pragma once
 
+// bitor macros
 #define LPIPP_BITOR_OVERRIDE(_1, _2, _3, NAME, ...) NAME
 
 #define LPIPP_BITOR_OP_IMPL(left_type, right_type, return_type)                                                        \
@@ -19,6 +20,7 @@
 #define LPIPP_BITOR_OP(...)                                                                                            \
   LPIPP_BITOR_OVERRIDE(__VA_ARGS__, LPIPP_DIFF_TYPE_BITOR_OP, LPIPP_SAME_TYPE_BITOR_OP, dummy)(__VA_ARGS__)
 
+// bitand macro
 #define LPIPP_BITAND_OVERRIDE(_1, _2, NAME, ...) NAME
 
 #define LPIPP_BITAND_OP_IMPL(left_type, right_type)                                                                    \
@@ -37,6 +39,7 @@
 #define LPIPP_BITAND_OP(...)                                                                                           \
   LPIPP_BITAND_OVERRIDE(__VA_ARGS__, LPIPP_DIFF_TYPE_BITAND_OP, LPIPP_SAME_TYPE_BITAND_OP, dummy)(__VA_ARGS__)
 
+// std::error_code macros
 #define LPIPP_IS_ERROR_CODE(error_enum)                                                                                \
   template <>                                                                                                          \
   struct std::is_error_code_enum<error_enum> : std::true_type {};
