@@ -34,5 +34,5 @@ TEST_CASE("modify epoll") {
     REQUIRE_FALSE(modify_result);
     REQUIRE(modify_result.error() == epoll::ModifyError::file_descriptor_same_with_epoll);
   }
-  CHECK(mq::unlink(queue_name));
+  (void)mq::unlink(queue_name);
 }
