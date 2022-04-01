@@ -11,6 +11,7 @@
       "description": "Default build using Ninja generator",
       "binaryDir": "${sourceDir}/build",
       "cacheVariables": {
+        "CMAKE_CXX_STANDARD": "20",
         "CMAKE_BUILD_TYPE": "Release",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
       },
