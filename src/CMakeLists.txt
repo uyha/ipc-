@@ -34,5 +34,10 @@ lpipp_add_library(lpipp-shm shm.cpp)
 add_library(lpipp::shm ALIAS lpipp-shm)
 target_link_libraries(lpipp-shm PRIVATE rt lpipp::detail::file-descriptor)
 
+lpipp_add_library(lpipp-socket socket.cpp)
+add_library(lpipp::socket ALIAS lpipp-socket)
+target_link_libraries(lpipp-socket PRIVATE lpipp::detail::file-descriptor)
+
 lpipp_add_library(lpipp-un un.cpp)
 add_library(lpipp::un ALIAS lpipp-un)
+target_link_libraries(lpipp-un PUBLIC lpipp::socket PRIVATE lpipp::detail::file-descriptor)

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "file_descriptor.hpp"
 #include "macros.hpp"
+#include "socket.hpp"
 
 #include <atomic>
 #include <sys/socket.h>
@@ -10,7 +10,7 @@
 #include <tl/expected.hpp>
 
 namespace lpipp {
-class un : FileDescriptor<un> {
+class un : public Socket<un> {
 public:
   enum class CreateError {
     permission_denied                          = EACCES,

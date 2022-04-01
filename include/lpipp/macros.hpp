@@ -50,3 +50,17 @@
   auto make_error_code(error_enum error) noexcept->std::error_code {                                                   \
     return {static_cast<int>(error), error_category};                                                                  \
   }
+
+// socket options
+#define LPIPP_SOCKOPT(opt, level_val, name_val, read_val, write_val, value_t)                                          \
+  struct opt {                                                                                                         \
+    using value_type = value_t;                                                                                        \
+                                                                                                                       \
+    static constexpr int level  = level_val;                                                                           \
+    static constexpr int name   = name_val;                                                                            \
+    static constexpr bool read  = read_val;                                                                            \
+    static constexpr bool write = write_val;                                                                           \
+                                                                                                                       \
+    value_type value;                                                                                                  \
+    ::socklen_t size = sizeof(value);                                                                                  \
+  }
