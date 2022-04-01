@@ -9,7 +9,6 @@ jobs:
       matrix:
         cpp_standard: [20]
         compiler:
-          - { cxx: g++-9 }
           - { cxx: g++-10 }
           - { cxx: clang++-10 }
           - { cxx: clang++-11 }
