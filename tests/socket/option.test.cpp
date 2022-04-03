@@ -26,11 +26,34 @@ TEST_CASE("setting socket option of a stream unix socket") {
 
   auto socket = un::create(Stream);
   REQUIRE(socket);
-  auto set_result = socket->set_option(BindToDevice{"eth0"});
-  if (set_result) {
-    auto get_result = socket->get_option<BindToDevice<IFNAMSIZ>>();
-    CHECK(get_result);
-    CHECK(get_result->value == "eth0"sv);
-    CHECK(get_result->size == 5);
+  SECTION("bind to device") {
+    auto set_result = socket->set_option(BindToDevice{"eth0"});
+    if (set_result) {
+      auto get_result = socket->get_option<BindToDevice<IFNAMSIZ>>();
+      CHECK(get_result);
+      CHECK(get_result->value == "eth0"sv);
+      CHECK(get_result->size == 5);
+    }
+  }
+  SECTION("detach filter") {
+    auto set_result = socket->set_option(DetachFilter{});
+    CHECK_FALSE(set_result);
+    CHECK(set_result.error() == std::errc::no_such_file_or_directory);
+  }
+  SECTION("lock filter") {
+    {
+      auto set_result = socket->set_option(LockFilter{true});
+      CHECK(set_result);
+      auto get_result = socket->get_option<LockFilter>();
+      CHECK(get_result);
+      CHECK(get_result->value);
+    }
+    {
+      auto set_result = socket->set_option(LockFilter{false});
+      CHECK(set_result);
+      auto get_result = socket->get_option<LockFilter>();
+      CHECK(get_result);
+      CHECK_FALSE(get_result->value);
+    }
   }
 }
