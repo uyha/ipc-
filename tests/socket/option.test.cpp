@@ -42,18 +42,16 @@ TEST_CASE("setting socket option of a stream unix socket") {
   }
   SECTION("lock filter") {
     {
+      auto get_result = socket->get_option<LockFilter>();
+      CHECK(get_result);
+      CHECK_FALSE(get_result->value);
+    }
+    {
       auto set_result = socket->set_option(LockFilter{true});
       CHECK(set_result);
       auto get_result = socket->get_option<LockFilter>();
       CHECK(get_result);
       CHECK(get_result->value);
-    }
-    {
-      auto set_result = socket->set_option(LockFilter{false});
-      CHECK(set_result);
-      auto get_result = socket->get_option<LockFilter>();
-      CHECK(get_result);
-      CHECK_FALSE(get_result->value);
     }
   }
 }
