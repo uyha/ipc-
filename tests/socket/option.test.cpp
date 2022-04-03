@@ -53,5 +53,10 @@ TEST_CASE("setting socket option of a stream unix socket") {
       CHECK(get_result);
       CHECK(get_result->value);
     }
+    {
+      auto set_result = socket->set_option(LockFilter{false});
+      CHECK_FALSE(set_result);
+      CHECK(set_result.error() == std::errc::operation_not_permitted);
+    }
   }
 }

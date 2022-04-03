@@ -7,21 +7,6 @@
 #include <type_traits>
 
 namespace lpipp {
-// clang-format off
-template <typename T>
-concept SocketOption = std::is_same_v<std::remove_cv_t<decltype(T::level)>, int> &&
-                       std::is_same_v<std::remove_cv_t<decltype(T::name)>, int> &&
-                       std::is_same_v<std::remove_cv_t<decltype(T::read)>, bool> &&
-                       std::is_same_v<std::remove_cv_t<decltype(T::write)>, bool> &&
-                       requires (T option){
-                        {option.value};
-                        {option.size};
-                       };
-// clang-format on
-template <typename T>
-concept SocketReadOption = SocketOption<T> && T::read;
-template <typename T>
-concept SocketWriteOption = SocketOption<T> && T::write;
 
 namespace socket_options {
 LPIPP_SOCKOPT(AcceptConnection, SOL_SOCKET, SO_ACCEPTCONN, true, false, bool);
@@ -55,7 +40,7 @@ namespace lpipp {
 template <typename T>
 class Socket : public FileDescriptor<T> {
 public:
-  template <SocketReadOption Option>
+  template <concepts::socket_read_option Option>
   auto get_option() -> tl::expected<Option, std::error_code> {
     auto option = Option{};
 
@@ -67,11 +52,9 @@ public:
     return option;
   }
 
-  template <SocketWriteOption Option>
+  template <concepts::socket_write_option Option>
   auto set_option(Option const &option) -> tl::expected<void, std::error_code> {
-    constexpr auto size = socklen_t{sizeof(option)};
-
-    auto const result = ::setsockopt(this->get_handle(), Option::level, Option::name, &option, size);
+    auto const result = ::setsockopt(this->get_handle(), Option::level, Option::name, &option, option.size);
     if (result == -1) {
       return tl::unexpected{std::make_error_code(static_cast<std::errc>(errno))};
     }
