@@ -1,6 +1,8 @@
 cmake_policy(SET CMP0110 NEW)
 
-include(use_conan)
+if(USE_CONAN)
+  include(use_conan)
+endif()
 include(build_options)
 
 find_package(Catch2 REQUIRED)
