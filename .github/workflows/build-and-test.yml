@@ -29,5 +29,3 @@ jobs:
         run: cmake --build --preset test -j$(nproc)
       - name: Run tests
         run: ctest --preset ci -j$(nproc)
-      - name: Build examples
-        run: cmake --build --preset example -j$(nproc)

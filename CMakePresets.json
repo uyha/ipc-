@@ -13,7 +13,8 @@
       "cacheVariables": {
         "CMAKE_CXX_STANDARD": "20",
         "CMAKE_BUILD_TYPE": "Release",
-        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "BUILD_EXAMPLES": "ON"
       },
       "environment": {}
     },
@@ -30,11 +31,6 @@
       "name": "test",
       "configurePreset": "default",
       "targets": "lpipp-tests"
-    },
-    {
-      "name": "example",
-      "configurePreset": "default",
-      "targets": "lpipp-examples"
     }
   ],
   "testPresets": [{
