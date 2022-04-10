@@ -1,6 +1,4 @@
-if(USE_CONAN)
-  include(use_conan)
-endif()
+include(Conan)
 
 find_package(fmt REQUIRED)
 

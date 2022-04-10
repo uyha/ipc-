@@ -1,7 +1,5 @@
-include(build_options)
-if(USE_CONAN)
-  include(use_conan)
-endif()
+include(Conan)
+include(CompileOptions)
 
 find_package(tl-expected REQUIRED)
 
