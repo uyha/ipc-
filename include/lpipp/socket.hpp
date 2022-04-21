@@ -112,7 +112,13 @@ public:
   auto get_option() -> tl::expected<Option, std::error_code> {
     auto option = Option{};
 
-    auto const result = ::getsockopt(this->get_handle(), Option::level, Option::name, &option.value, &option.size);
+    int result;
+    if constexpr (std::is_pointer_v<typename Option::value_type>) {
+      result = ::getsockopt(this->get_handle(), Option::level, Option::name, option.value, &option.size);
+    } else {
+      result = ::getsockopt(this->get_handle(), Option::level, Option::name, &option.value, &option.size);
+    }
+
     if (result == -1) {
       return tl::unexpected{std::make_error_code(static_cast<std::errc>(errno))};
     }
@@ -122,7 +128,13 @@ public:
 
   template <concepts::socket_write_option Option>
   auto set_option(Option const &option) -> tl::expected<void, std::error_code> {
-    auto const result = ::setsockopt(this->get_handle(), Option::level, Option::name, &option, option.size);
+    int result;
+    if constexpr (std::is_pointer_v<typename Option::value_type>) {
+      result = ::setsockopt(this->get_handle(), Option::level, Option::name, option, option.size);
+    } else {
+      result = ::setsockopt(this->get_handle(), Option::level, Option::name, &option, option.size);
+    }
+
     if (result == -1) {
       return tl::unexpected{std::make_error_code(static_cast<std::errc>(errno))};
     }
