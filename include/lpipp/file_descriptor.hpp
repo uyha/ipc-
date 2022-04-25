@@ -15,7 +15,7 @@
 namespace lpipp {
 enum class DupError : int { file_descriptors_per_process_limit_reached = EMFILE };
 enum class DupAtLeastError : int {
-  invalid_minimum_file_descriptor_number     = EINVAL,
+  minimum_file_descriptor_number_invalid     = EINVAL,
   file_descriptors_per_process_limit_reached = EMFILE
 };
 enum class StatError : int { memory_insufficient = ENOMEM };

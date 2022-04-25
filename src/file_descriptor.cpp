@@ -20,7 +20,7 @@ struct FcntlDuplicateAtLeastErrorCategory : std::error_category {
   }
   auto message(int error) const -> std::string {
     switch (static_cast<lpipp::DupAtLeastError>(error)) {
-    case lpipp::DupAtLeastError::invalid_minimum_file_descriptor_number:
+    case lpipp::DupAtLeastError::minimum_file_descriptor_number_invalid:
       return "Minimum file descriptor number is negative or is greater than the maximum allowable value";
     case lpipp::DupAtLeastError::file_descriptors_per_process_limit_reached:
       return "Too many file descriptors are being opened by this process";
